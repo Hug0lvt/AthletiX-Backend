@@ -4,23 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Repositories.Entities
 {
-    public class Session
+    public class SessionEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public DateTime Date { get; set; }
         public TimeSpan Duration { get; set; }
-        public List<Exercise> Exercises { get; set; } = new List<Exercise>();
+        public List<int> ExercisesIds { get; set; } = new List<int>();
 
-        public Session(int id, string name, DateTime date, TimeSpan duration, List<Exercise> exercises) 
-        { 
+        public SessionEntity(int id, string name, DateTime date, TimeSpan duration, List<int> exercises)
+        {
             Id = id;
             Name = name;
             Date = date;
             Duration = duration;
-            Exercises = exercises;
+            ExercisesIds = exercises;
         }
     }
 }

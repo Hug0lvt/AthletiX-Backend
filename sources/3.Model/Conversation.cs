@@ -8,6 +8,8 @@ namespace Model
 {
     public class Conversation
     {
-        public Dictionary<List<Profile>, List<Message>> Messages { get; set; } = new Dictionary<List<Profile>, List<Message>>();
+        public int Id { get; set; }
+        public List<Profile> Profiles { get; set; } = new List<Profile>();
+        public List<Message> Messages { get; set; } = new List<Message>();
     }
 }

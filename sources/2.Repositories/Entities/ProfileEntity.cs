@@ -1,14 +1,14 @@
 ﻿using Shared.Enums;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Model
+namespace Repositories.Entities
 {
-    public class Profile
+    public class ProfileEntity
     {
         public int Id { get; set; }
         public string Username { get; set; }
@@ -17,9 +17,9 @@ namespace Model
         public string Email { get; set; }
         public float Weight { get; set; }
         public float Height { get; set; }
-        public DataUser Data { get; set; }
+        public int DataId { get; set; }
 
-        public Profile(int id, string username, Role role, int age, string email, float weight, float height, DataUser data)
+        public ProfileEntity(int id, string username, Role role, int age, string email, float weight, float height, int data)
         {
             Id = id;
             Username = username;
@@ -28,7 +28,7 @@ namespace Model
             Email = email;
             Weight = weight;
             Height = height;
-            Data = data;
+            DataId = data;
         }
     }
 }

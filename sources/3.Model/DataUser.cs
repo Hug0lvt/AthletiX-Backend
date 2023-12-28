@@ -10,7 +10,7 @@ namespace Model
     public class DataUser
     {
         public List<Conversation> Conversations { get; set; } = new List<Conversation>();
-        public List<Post> Posts { get; set; }
-        public List<Session> Sessions { get; set; }
+        public List<Post> Posts { get; set; } = new List<Post>();
+        public List<Session> Sessions { get; set; } = new List<Session>();
     }
 }

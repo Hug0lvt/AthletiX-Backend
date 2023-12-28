@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Repositories.Entities
 {
-    public class Set
+    public class SetEntity
     {
         public int Id { get; set; }
         public int Reps { get; set; }
@@ -15,7 +15,7 @@ namespace Model
         public TimeSpan Rest { get; set; }
         public SetMode Mode { get; set; }
 
-        public Set(int id, int reps, List<float> weight, TimeSpan rest, SetMode mode)
+        public SetEntity(int id, int reps, List<float> weight, TimeSpan rest, SetMode mode)
         {
             Id = id;
             Reps = reps;

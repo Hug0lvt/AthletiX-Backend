@@ -4,20 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Repositories.Entities
 {
-    public class Category
+    public class CategoryEntity
     {
         public int Id { get; set; }
         public string Title { get; set; }
 
-        public Category(int id, string title)
+        public CategoryEntity(int id, string title)
         {
             Id = id;
             Title = title;
         }
-
     }
-
 
 }

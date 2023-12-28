@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Repositories.Entities
 {
-    public class Message
+    public class MessageEntity
     {
         public int Id { get; set; }
         public string Content { get; set; }
         public DateTime DateSent { get; set; }
-        public Profile Sender { get; set; }
+        public int SenderId { get; set; }
 
-        public Message(int id, string content, DateTime dateSent, Profile sender)
+        public MessageEntity(int id, string content, DateTime dateSent, int sender)
         {
             Id = id;
             Content = content;
             DateSent = dateSent;
-            Sender = sender;
+            SenderId = sender;
         }
     }
 }

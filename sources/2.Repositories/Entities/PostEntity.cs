@@ -4,32 +4,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
-namespace Model
+namespace Repositories.Entities
 {
-    public class Post
+    public class PostEntity
     {
         public int Id { get; set; }
-        public Profile Publisher { get; set; }
-        public Category Category { get; set; }
+        public int PublisherId { get; set; }
+        public int CategoryId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public PublicationType PublicationType { get; set; }
         public string Content { get; set; }
-        public List<Comment> Comments { get; set; } = new List<Comment>();
+        public List<int> CommentsIds { get; set; } = new List<int>();
 
-        public Post(int id, Profile publisher, Category category, string title, 
-            string description, PublicationType publicationType, string content, List<Comment> comments)
+        public PostEntity(int id, int publisher, int category, string title,
+            string description, PublicationType publicationType, string content, List<int> comments)
         {
             Id = id;
-            Publisher = publisher;
-            Category = category;
+            PublisherId = publisher;
+            CategoryId = category;
             Title = title;
             Description = description;
             PublicationType = publicationType;
             Content = content;
-            Comments = comments;
+            CommentsIds = comments;
         }
     }
 }
