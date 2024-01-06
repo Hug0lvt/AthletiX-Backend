@@ -5,6 +5,9 @@ using API.Exceptions;
 
 namespace API.Controllers.v1_0
 {
+    /// <summary>
+    /// Controller for managing operations related to sessions.
+    /// </summary>
     [ApiVersion("1.0")]
     [ApiExplorerSettings(GroupName = "Session APIs")]
     [ApiController]
@@ -13,11 +16,20 @@ namespace API.Controllers.v1_0
     {
         private readonly SessionService _sessionService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionController"/> class.
+        /// </summary>
+        /// <param name="sessionService">The session service.</param>
         public SessionController(SessionService sessionService)
         {
             _sessionService = sessionService;
         }
 
+        /// <summary>
+        /// Creates a new session.
+        /// </summary>
+        /// <param name="session">The session to create.</param>
+        /// <returns>The newly created session.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Session")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult CreateSession([FromBody] Session session)
@@ -26,6 +38,10 @@ namespace API.Controllers.v1_0
             return CreatedAtAction(nameof(GetSessionById), new { sessionId = createdSession.Id }, createdSession);
         }
 
+        /// <summary>
+        /// Gets all sessions.
+        /// </summary>
+        /// <returns>A list of all sessions.</returns>
         [HttpGet(Name = "GET - Entrypoint for get all Sessions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllSessions()
@@ -34,6 +50,11 @@ namespace API.Controllers.v1_0
             return Ok(sessions);
         }
 
+        /// <summary>
+        /// Gets a session by its identifier.
+        /// </summary>
+        /// <param name="sessionId">The session identifier.</param>
+        /// <returns>The session with the specified identifier.</returns>
         [HttpGet("{sessionId}", Name = "GET - Entrypoint for get Session by Id")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -49,6 +70,12 @@ namespace API.Controllers.v1_0
             return Ok(session);
         }
 
+        /// <summary>
+        /// Updates a session.
+        /// </summary>
+        /// <param name="sessionId">The session identifier.</param>
+        /// <param name="updatedSession">The updated session information.</param>
+        /// <returns>The updated session.</returns>
         [HttpPut("{sessionId}", Name = "PUT - Entrypoint for update Session")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,7 +84,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var session = _sessionService.UpdateSession(updatedSession);
-
                 return Ok(session);
             }
             catch (NotFoundException ex)
@@ -66,6 +92,11 @@ namespace API.Controllers.v1_0
             }
         }
 
+        /// <summary>
+        /// Deletes a session by its identifier.
+        /// </summary>
+        /// <param name="sessionId">The session identifier.</param>
+        /// <returns>The deleted session.</returns>
         [HttpDelete("{sessionId}", Name = "DELETE - Entrypoint for remove Session")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -74,7 +105,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var deletedSession = _sessionService.DeleteSession(sessionId);
-
                 return Ok(deletedSession);
             }
             catch (NotFoundException ex)

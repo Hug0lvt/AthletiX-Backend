@@ -5,6 +5,9 @@ using API.Exceptions;
 
 namespace API.Controllers.v1_0
 {
+    /// <summary>
+    /// Controller for managing operations related to comments.
+    /// </summary>
     [ApiVersion("1.0")]
     [ApiExplorerSettings(GroupName = "Comment APIs")]
     [ApiController]
@@ -13,11 +16,20 @@ namespace API.Controllers.v1_0
     {
         private readonly CommentService _commentService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommentController"/> class.
+        /// </summary>
+        /// <param name="commentService">The comment service.</param>
         public CommentController(CommentService commentService)
         {
             _commentService = commentService;
         }
 
+        /// <summary>
+        /// Creates a new comment.
+        /// </summary>
+        /// <param name="comment">The comment to create.</param>
+        /// <returns>The newly created comment.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Comment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult CreateComment([FromBody] Comment comment)
@@ -26,6 +38,10 @@ namespace API.Controllers.v1_0
             return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.Id }, createdComment);
         }
 
+        /// <summary>
+        /// Gets all comments.
+        /// </summary>
+        /// <returns>A list of all comments.</returns>
         [HttpGet(Name = "GET - Entrypoint for get all Comments")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllComments()
@@ -34,6 +50,11 @@ namespace API.Controllers.v1_0
             return Ok(comments);
         }
 
+        /// <summary>
+        /// Gets a comment by its identifier.
+        /// </summary>
+        /// <param name="commentId">The comment identifier.</param>
+        /// <returns>The comment with the specified identifier.</returns>
         [HttpGet("{commentId}", Name = "GET - Entrypoint for get Comment by id")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -49,6 +70,12 @@ namespace API.Controllers.v1_0
             return Ok(comment);
         }
 
+        /// <summary>
+        /// Updates a comment.
+        /// </summary>
+        /// <param name="commentId">The comment identifier.</param>
+        /// <param name="updatedComment">The updated comment information.</param>
+        /// <returns>The updated comment.</returns>
         [HttpPut("{commentId}", Name = "PUT - Entrypoint for update Comment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,7 +84,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var comment = _commentService.UpdateComment(updatedComment);
-
                 return Ok(comment);
             }
             catch (NotFoundException ex)
@@ -66,6 +92,11 @@ namespace API.Controllers.v1_0
             }
         }
 
+        /// <summary>
+        /// Deletes a comment by its identifier.
+        /// </summary>
+        /// <param name="commentId">The comment identifier.</param>
+        /// <returns>The deleted comment.</returns>
         [HttpDelete("{commentId}", Name = "DELETE - Entrypoint for remove Comment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -74,7 +105,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var deletedComment = _commentService.DeleteComment(commentId);
-
                 return Ok(deletedComment);
             }
             catch (NotFoundException ex)

@@ -5,6 +5,9 @@ using API.Exceptions;
 
 namespace API.Controllers.v1_0
 {
+    /// <summary>
+    /// Controller for managing operations related to exercises.
+    /// </summary>
     [ApiVersion("1.0")]
     [ApiExplorerSettings(GroupName = "Exercise APIs")]
     [ApiController]
@@ -13,11 +16,20 @@ namespace API.Controllers.v1_0
     {
         private readonly ExerciseService _exerciseService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExerciseController"/> class.
+        /// </summary>
+        /// <param name="exerciseService">The exercise service.</param>
         public ExerciseController(ExerciseService exerciseService)
         {
             _exerciseService = exerciseService;
         }
 
+        /// <summary>
+        /// Creates a new exercise.
+        /// </summary>
+        /// <param name="exercise">The exercise to create.</param>
+        /// <returns>The newly created exercise.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Exercise")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult CreateExercise([FromBody] Exercise exercise)
@@ -26,6 +38,10 @@ namespace API.Controllers.v1_0
             return CreatedAtAction(nameof(GetExerciseById), new { exerciseId = createdExercise.Id }, createdExercise);
         }
 
+        /// <summary>
+        /// Gets all exercises.
+        /// </summary>
+        /// <returns>A list of all exercises.</returns>
         [HttpGet(Name = "GET - Entrypoint for get all Exercises")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllExercises()
@@ -34,6 +50,11 @@ namespace API.Controllers.v1_0
             return Ok(exercises);
         }
 
+        /// <summary>
+        /// Gets an exercise by its identifier.
+        /// </summary>
+        /// <param name="exerciseId">The exercise identifier.</param>
+        /// <returns>The exercise with the specified identifier.</returns>
         [HttpGet("{exerciseId}", Name = "GET - Entrypoint for get Exercise by Id")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -49,6 +70,12 @@ namespace API.Controllers.v1_0
             return Ok(exercise);
         }
 
+        /// <summary>
+        /// Updates an exercise.
+        /// </summary>
+        /// <param name="exerciseId">The exercise identifier.</param>
+        /// <param name="updatedExercise">The updated exercise information.</param>
+        /// <returns>The updated exercise.</returns>
         [HttpPut("{exerciseId}", Name = "PUT - Entrypoint for update Exercise")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,7 +84,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var exercise = _exerciseService.UpdateExercise(updatedExercise);
-
                 return Ok(exercise);
             }
             catch (NotFoundException ex)
@@ -66,6 +92,11 @@ namespace API.Controllers.v1_0
             }
         }
 
+        /// <summary>
+        /// Deletes an exercise by its identifier.
+        /// </summary>
+        /// <param name="exerciseId">The exercise identifier.</param>
+        /// <returns>The deleted exercise.</returns>
         [HttpDelete("{exerciseId}", Name = "DELETE - Entrypoint for remove Exercise")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -74,7 +105,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var deletedExercise = _exerciseService.DeleteExercise(exerciseId);
-
                 return Ok(deletedExercise);
             }
             catch (NotFoundException ex)

@@ -5,6 +5,9 @@ using API.Exceptions;
 
 namespace API.Controllers.v1_0
 {
+    /// <summary>
+    /// Controller for managing operations related to sets.
+    /// </summary>
     [ApiVersion("1.0")]
     [ApiExplorerSettings(GroupName = "Set APIs")]
     [ApiController]
@@ -13,11 +16,20 @@ namespace API.Controllers.v1_0
     {
         private readonly SetService _setService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SetController"/> class.
+        /// </summary>
+        /// <param name="setService">The set service.</param>
         public SetController(SetService setService)
         {
             _setService = setService;
         }
 
+        /// <summary>
+        /// Creates a new set.
+        /// </summary>
+        /// <param name="set">The set to create.</param>
+        /// <returns>The newly created set.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Set")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult CreateSet([FromBody] Set set)
@@ -26,6 +38,10 @@ namespace API.Controllers.v1_0
             return CreatedAtAction(nameof(GetSetById), new { setId = createdSet.Id }, createdSet);
         }
 
+        /// <summary>
+        /// Gets all sets.
+        /// </summary>
+        /// <returns>A list of all sets.</returns>
         [HttpGet(Name = "GET - Entrypoint for get all Sets")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllSets()
@@ -34,6 +50,11 @@ namespace API.Controllers.v1_0
             return Ok(sets);
         }
 
+        /// <summary>
+        /// Gets a set by its identifier.
+        /// </summary>
+        /// <param name="setId">The set identifier.</param>
+        /// <returns>The set with the specified identifier.</returns>
         [HttpGet("{setId}", Name = "GET - Entrypoint for get Set by Id")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -49,6 +70,12 @@ namespace API.Controllers.v1_0
             return Ok(set);
         }
 
+        /// <summary>
+        /// Updates a set.
+        /// </summary>
+        /// <param name="setId">The set identifier.</param>
+        /// <param name="updatedSet">The updated set information.</param>
+        /// <returns>The updated set.</returns>
         [HttpPut("{setId}", Name = "PUT - Entrypoint for update Set")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,7 +84,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var set = _setService.UpdateSet(updatedSet);
-
                 return Ok(set);
             }
             catch (NotFoundException ex)
@@ -66,6 +92,11 @@ namespace API.Controllers.v1_0
             }
         }
 
+        /// <summary>
+        /// Deletes a set by its identifier.
+        /// </summary>
+        /// <param name="setId">The set identifier.</param>
+        /// <returns>The deleted set.</returns>
         [HttpDelete("{setId}", Name = "DELETE - Entrypoint for remove Set")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -74,7 +105,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var deletedSet = _setService.DeleteSet(setId);
-
                 return Ok(deletedSet);
             }
             catch (NotFoundException ex)

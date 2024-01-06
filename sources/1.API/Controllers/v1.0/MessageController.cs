@@ -5,6 +5,9 @@ using API.Exceptions;
 
 namespace API.Controllers.v1_0
 {
+    /// <summary>
+    /// Controller for managing operations related to messages.
+    /// </summary>
     [ApiVersion("1.0")]
     [ApiExplorerSettings(GroupName = "Message APIs")]
     [ApiController]
@@ -13,11 +16,20 @@ namespace API.Controllers.v1_0
     {
         private readonly MessageService _messageService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessageController"/> class.
+        /// </summary>
+        /// <param name="messageService">The message service.</param>
         public MessageController(MessageService messageService)
         {
             _messageService = messageService;
         }
 
+        /// <summary>
+        /// Creates a new message.
+        /// </summary>
+        /// <param name="message">The message to create.</param>
+        /// <returns>The newly created message.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Message")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult CreateMessage([FromBody] Message message)
@@ -26,6 +38,10 @@ namespace API.Controllers.v1_0
             return CreatedAtAction(nameof(GetMessageById), new { messageId = createdMessage.Id }, createdMessage);
         }
 
+        /// <summary>
+        /// Gets all messages.
+        /// </summary>
+        /// <returns>A list of all messages.</returns>
         [HttpGet(Name = "GET - Entrypoint for get all Messages")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllMessages()
@@ -34,6 +50,11 @@ namespace API.Controllers.v1_0
             return Ok(messages);
         }
 
+        /// <summary>
+        /// Gets a message by its identifier.
+        /// </summary>
+        /// <param name="messageId">The message identifier.</param>
+        /// <returns>The message with the specified identifier.</returns>
         [HttpGet("{messageId}", Name = "GET - Entrypoint for get Message by Id")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -49,6 +70,12 @@ namespace API.Controllers.v1_0
             return Ok(message);
         }
 
+        /// <summary>
+        /// Updates a message.
+        /// </summary>
+        /// <param name="messageId">The message identifier.</param>
+        /// <param name="updatedMessage">The updated message information.</param>
+        /// <returns>The updated message.</returns>
         [HttpPut("{messageId}", Name = "PUT - Entrypoint for update Message")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,7 +84,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var message = _messageService.UpdateMessage(updatedMessage);
-
                 return Ok(message);
             }
             catch (NotFoundException ex)
@@ -66,6 +92,11 @@ namespace API.Controllers.v1_0
             }
         }
 
+        /// <summary>
+        /// Deletes a message by its identifier.
+        /// </summary>
+        /// <param name="messageId">The message identifier.</param>
+        /// <returns>The deleted message.</returns>
         [HttpDelete("{messageId}", Name = "DELETE - Entrypoint for remove Message")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -74,7 +105,6 @@ namespace API.Controllers.v1_0
             try
             {
                 var deletedMessage = _messageService.DeleteMessage(messageId);
-
                 return Ok(deletedMessage);
             }
             catch (NotFoundException ex)

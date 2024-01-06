@@ -1,20 +1,35 @@
-﻿using Model;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using Model;
 using Repositories;
 using API.Exceptions;
 
 namespace API.Services
 {
+    /// <summary>
+    /// Service for managing posts.
+    /// </summary>
     public class PostService
     {
         private readonly ILogger<PostService> _logger;
         private readonly AppDbContext _dbContext;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PostService"/> class.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="logger">The logger instance.</param>
         public PostService(AppDbContext dbContext, ILogger<PostService> logger)
         {
             _dbContext = dbContext;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Creates a new post.
+        /// </summary>
+        /// <param name="post">The post to be created.</param>
+        /// <returns>The created post.</returns>
         public Post CreatePost(Post post)
         {
             _dbContext.Posts.Add(post);
@@ -22,16 +37,30 @@ namespace API.Services
             return post;
         }
 
+        /// <summary>
+        /// Gets all posts.
+        /// </summary>
+        /// <returns>A list of all posts.</returns>
         public List<Post> GetAllPosts()
         {
             return _dbContext.Posts.ToList();
         }
 
+        /// <summary>
+        /// Gets a post by its identifier.
+        /// </summary>
+        /// <param name="postId">The identifier of the post.</param>
+        /// <returns>The post with the specified identifier.</returns>
         public Post GetPostById(int postId)
         {
             return _dbContext.Posts.FirstOrDefault(p => p.Id == postId);
         }
 
+        /// <summary>
+        /// Updates an existing post.
+        /// </summary>
+        /// <param name="updatedPost">The updated post.</param>
+        /// <returns>The updated post.</returns>
         public Post UpdatePost(Post updatedPost)
         {
             var existingPost = _dbContext.Posts.Find(updatedPost.Id);
@@ -40,14 +69,20 @@ namespace API.Services
             {
                 existingPost.Title = updatedPost.Title;
                 existingPost.Description = updatedPost.Description;
-                // On Update Content ???
+                // You may want to include updating the content if necessary
                 _dbContext.SaveChanges();
                 return existingPost;
             }
+
             _logger.LogTrace("[LOG | PostService] - (UpdatePost): Post not found");
             throw new NotFoundException("[LOG | PostService] - (UpdatePost): Post not found");
         }
 
+        /// <summary>
+        /// Deletes a post by its identifier.
+        /// </summary>
+        /// <param name="postId">The identifier of the post to be deleted.</param>
+        /// <returns>The deleted post.</returns>
         public Post DeletePost(int postId)
         {
             var postToDelete = _dbContext.Posts.Find(postId);
@@ -58,6 +93,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return postToDelete;
             }
+
             _logger.LogTrace("[LOG | PostService] - (DeletePost): Post not found");
             throw new NotFoundException("[LOG | PostService] - (DeletePost): Post not found");
         }
