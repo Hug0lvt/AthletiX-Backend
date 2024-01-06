@@ -6,11 +6,13 @@ namespace API.Services
 {
     public class PostService
     {
+        private readonly ILogger<PostService> _logger;
         private readonly AppDbContext _dbContext;
 
-        public PostService(AppDbContext dbContext)
+        public PostService(AppDbContext dbContext, ILogger<PostService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public Post CreatePost(Post post)
@@ -42,7 +44,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return existingPost;
             }
-
+            _logger.LogTrace("[LOG | PostService] - (UpdatePost): Post not found");
             throw new NotFoundException("[LOG | PostService] - (UpdatePost): Post not found");
         }
 
@@ -56,7 +58,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return postToDelete;
             }
-
+            _logger.LogTrace("[LOG | PostService] - (DeletePost): Post not found");
             throw new NotFoundException("[LOG | PostService] - (DeletePost): Post not found");
         }
     }

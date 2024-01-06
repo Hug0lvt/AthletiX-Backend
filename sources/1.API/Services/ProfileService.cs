@@ -6,11 +6,13 @@ namespace API.Services
 {
     public class ProfileService
     {
+        private readonly ILogger<ProfileService> _logger;
         private readonly AppDbContext _dbContext;
 
-        public ProfileService(AppDbContext dbContext)
+        public ProfileService(AppDbContext dbContext, ILogger<ProfileService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public Profile CreateProfile(Profile profile)
@@ -45,7 +47,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return existingProfile;
             }
-
+            _logger.LogTrace("[LOG | ProfileService] - (UpdateProfile): Profile not found");
             throw new NotFoundException("[LOG | ProfileService] - (UpdateProfile): Profile not found");
         }
 
@@ -59,7 +61,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return profileToDelete;
             }
-
+            _logger.LogTrace("[LOG | ProfileService] - (DeleteProfile): Profile not found");
             throw new NotFoundException("[LOG | ProfileService] - (DeleteProfile): Profile not found");
         }
     }

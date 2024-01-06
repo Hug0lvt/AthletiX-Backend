@@ -6,11 +6,13 @@ namespace API.Services
 {
     public class SessionService
     {
+        private readonly ILogger<SessionService> _logger;
         private readonly AppDbContext _dbContext;
 
-        public SessionService(AppDbContext dbContext)
+        public SessionService(AppDbContext dbContext, ILogger<SessionService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public Session CreateSession(Session session)
@@ -42,7 +44,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return existingSession;
             }
-
+            _logger.LogTrace("[LOG | SessionService] - (UpdateSession): Session not found");
             throw new NotFoundException("[LOG | SessionService] - (UpdateSession): Session not found");
         }
 
@@ -56,7 +58,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return sessionToDelete;
             }
-
+            _logger.LogTrace("[LOG | SessionService] - (DeleteSession): Session not found");
             throw new NotFoundException("[LOG | SessionService] - (DeleteSession): Session not found");
         }
     }

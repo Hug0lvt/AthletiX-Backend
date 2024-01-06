@@ -6,11 +6,13 @@ namespace API.Services
 {
     public class CategoryService
     {
+        private readonly ILogger<CategoryService> _logger;
         private readonly AppDbContext _dbContext;
 
-        public CategoryService(AppDbContext dbContext)
+        public CategoryService(AppDbContext dbContext, ILogger<CategoryService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public Category CreateCategory(Category category)
@@ -40,7 +42,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return existingCategory;
             }
-
+            _logger.LogTrace("[LOG | CategoryService] - (UpdateCategory) : Category not found");
             throw new NotFoundException("[LOG | CategoryService] - (UpdateCategory) : Category not found");
         }
 
@@ -54,7 +56,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return categoryToDelete;
             }
-
+            _logger.LogTrace("[LOG | CategoryService] - (DeleteCategory) : Category not found");
             throw new NotFoundException("[LOG | CategoryService] - (DeleteCategory) : Category not found");
         }
     }

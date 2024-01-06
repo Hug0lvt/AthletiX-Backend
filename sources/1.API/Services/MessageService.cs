@@ -6,11 +6,14 @@ namespace API.Services
 {
     public class MessageService
     {
+        private readonly ILogger<MessageService> _logger;
+
         private readonly AppDbContext _dbContext;
 
-        public MessageService(AppDbContext dbContext)
+        public MessageService(AppDbContext dbContext, ILogger<MessageService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public Message CreateMessage(Message message)
@@ -40,7 +43,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return existingMessage;
             }
-
+            _logger.LogTrace("[LOG | MessageService] - (UpdateMessage): Message not found");
             throw new NotFoundException("[LOG | MessageService] - (UpdateMessage): Message not found");
         }
 
@@ -54,7 +57,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return messageToDelete;
             }
-
+            _logger.LogTrace("[LOG | MessageService] - (DeleteMessage): Message not found");
             throw new NotFoundException("[LOG | MessageService] - (DeleteMessage): Message not found");
         }
     }

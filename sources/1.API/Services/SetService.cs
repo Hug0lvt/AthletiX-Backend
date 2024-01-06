@@ -6,11 +6,13 @@ namespace API.Services
 {
     public class SetService
     {
+        private readonly ILogger<SetService> _logger;
         private readonly AppDbContext _dbContext;
 
-        public SetService(AppDbContext dbContext)
+        public SetService(AppDbContext dbContext, ILogger<SetService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public Set CreateSet(Set set)
@@ -43,7 +45,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return existingSet;
             }
-
+            _logger.LogTrace("[LOG | SetService] - (UpdateSet): Set not found");
             throw new NotFoundException("[LOG | SetService] - (UpdateSet): Set not found");
         }
 
@@ -57,7 +59,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return setToDelete;
             }
-
+            _logger.LogTrace("[LOG | SetService] - (DeleteSet): Set not found");
             throw new NotFoundException("[LOG | SetService] - (DeleteSet): Set not found");
         }
     }

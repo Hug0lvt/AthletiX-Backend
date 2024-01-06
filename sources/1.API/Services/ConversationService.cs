@@ -6,11 +6,13 @@ namespace API.Services
 {
     public class ConversationService
     {
+        private readonly ILogger<ConversationService> _logger;
         private readonly AppDbContext _dbContext;
 
-        public ConversationService(AppDbContext dbContext)
+        public ConversationService(AppDbContext dbContext, ILogger<ConversationService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public Conversation CreateConversation(Conversation conversation)
@@ -40,7 +42,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return conversationToDelete;
             }
-
+            _logger.LogTrace("[LOG | ConversationService] - (DeleteConversation): Conversation not found");
             throw new NotFoundException("[LOG | ConversationService] - (DeleteConversation): Conversation not found");
         }
     }

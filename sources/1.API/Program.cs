@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using Repositories;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using API.Services.Notification;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,9 @@ var configuration = builder.Configuration;
 //Database
 builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+//Logging
+builder.Services.AddLogging(builder => builder.AddConsole());
 
 //Injection de dependance
 builder.Services.AddScoped<CategoryService>();
@@ -27,6 +33,13 @@ builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<SetService>();
 
+//Notifications
+builder.Services.AddSingleton<FCMService>();
+FirebaseApp.Create(new AppOptions()//TODO ggkey.json à UPDATE (pas le bon)
+{
+    Credential = GoogleCredential.FromFile("ggkey.json"),
+});
+
 //API And Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -35,7 +48,7 @@ builder.Services.AddSwaggerGen(opts =>
     opts.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "1.0",
-        Title = "Athlethix API API",
+        Title = "Athletix API",
         Description = "Available APIs for dialog with front AthlethixApp."
     });
 

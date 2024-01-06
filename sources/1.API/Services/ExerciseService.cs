@@ -6,11 +6,13 @@ namespace API.Services
 {
     public class ExerciseService
     {
+        private readonly ILogger<ExerciseService> _logger;
         private readonly AppDbContext _dbContext;
 
-        public ExerciseService(AppDbContext dbContext)
+        public ExerciseService(AppDbContext dbContext, ILogger<ExerciseService> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public Exercise CreateExercise(Exercise exercise)
@@ -42,7 +44,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return existingExercise;
             }
-
+            _logger.LogTrace("[LOG | ExerciseService] - (UpdateExercise): Exercise not found");
             throw new NotFoundException("[LOG | ExerciseService] - (UpdateExercise): Exercise not found");
         }
 
@@ -56,7 +58,7 @@ namespace API.Services
                 _dbContext.SaveChanges();
                 return exerciseToDelete;
             }
-
+            _logger.LogTrace("[LOG | ExerciseService] - (DeleteExercise): Exercise not found");
             throw new NotFoundException("[LOG | ExerciseService] - (DeleteExercise): Exercise not found");
         }
     }
