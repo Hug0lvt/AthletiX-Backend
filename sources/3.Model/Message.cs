@@ -13,12 +13,5 @@ namespace Model
         public DateTime DateSent { get; set; }
         public Profile Sender { get; set; }
 
-        public Message(int id, string content, DateTime dateSent, Profile sender)
-        {
-            Id = id;
-            Content = content;
-            DateSent = dateSent;
-            Sender = sender;
-        }
     }
 }

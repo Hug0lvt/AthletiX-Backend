@@ -19,17 +19,5 @@ namespace Model
         public string Content { get; set; }
         public List<Comment> Comments { get; set; } = new List<Comment>();
 
-        public Post(int id, Profile publisher, Category category, string title, 
-            string description, PublicationType publicationType, string content, List<Comment> comments)
-        {
-            Id = id;
-            Publisher = publisher;
-            Category = category;
-            Title = title;
-            Description = description;
-            PublicationType = publicationType;
-            Content = content;
-            Comments = comments;
-        }
     }
 }

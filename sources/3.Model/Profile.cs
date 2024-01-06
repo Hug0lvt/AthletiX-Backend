@@ -17,18 +17,6 @@ namespace Model
         public string Email { get; set; }
         public float Weight { get; set; }
         public float Height { get; set; }
-        public DataUser Data { get; set; }
 
-        public Profile(int id, string username, Role role, int age, string email, float weight, float height, DataUser data)
-        {
-            Id = id;
-            Username = username;
-            Role = role;
-            Age = age;
-            Email = email;
-            Weight = weight;
-            Height = height;
-            Data = data;
-        }
     }
 }

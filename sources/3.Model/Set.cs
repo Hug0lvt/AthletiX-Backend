@@ -15,13 +15,5 @@ namespace Model
         public TimeSpan Rest { get; set; }
         public SetMode Mode { get; set; }
 
-        public Set(int id, int reps, List<float> weight, TimeSpan rest, SetMode mode)
-        {
-            Id = id;
-            Reps = reps;
-            Weight = weight;
-            Rest = rest;
-            Mode = mode;
-        }
     }
 }
