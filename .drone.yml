@@ -26,7 +26,7 @@ steps:
       depends_on: [build]
 
     - name: code-analysis
-      image: sonarsource/sonar-scanner-cli:latest
+      image: hub.codefirst.iut.uca.fr/hugo.livet/codefirst-dronesonarplugin-dotnet8
       commands:
         - cd sources/
         - dotnet restore Backend.sln
