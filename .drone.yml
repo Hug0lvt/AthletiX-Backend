@@ -20,7 +20,7 @@ steps:
     - name: tests
       image: mcr.microsoft.com/dotnet/sdk:8.0
       commands:
-        - cd Sources
+        - cd sources
         - dotnet restore Backend.sln
         - dotnet test Backend.sln --no-restore
       depends_on: [build]
@@ -45,21 +45,21 @@ steps:
 #          from_secret: SECRET_SONAR_LOGIN
 #      depends_on: [tests]
 
-#    - name: generate-doxygen
-#      image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-docdeployer
-#      failure: ignore
-#      volumes:
-#        - name: docs
-#          path: /docs/doxygen
-#      commands:
-#        - /entrypoint.sh
-#      when:
-#        branch:
-#          - master
-#        event:
-#          - push
-#          - pull_request
-#      depends_on: [ tests ]
+    - name: generate-doxygen
+      image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-docdeployer
+      failure: ignore
+      volumes:
+        - name: docs
+          path: /docs/doxygen
+      commands:
+        - /entrypoint.sh
+      when:
+        branch:
+          - master
+        event:
+          - push
+          - pull_request
+      depends_on: [ tests ]
 
 volumes:
 - name: docs
