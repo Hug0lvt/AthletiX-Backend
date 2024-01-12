@@ -34,7 +34,7 @@ builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<SetService>();
 
 //Notifications
-builder.Services.AddSingleton<FCMService>();
+builder.Services.AddScoped<FCMService>();
 FirebaseApp.Create(new AppOptions()//TODO ggkey.json à UPDATE (pas le bon)
 {
     Credential = GoogleCredential.FromFile("ggkey.json"),

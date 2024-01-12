@@ -12,6 +12,8 @@ namespace Model
     {
         public int Id { get; set; }
         public string Username { get; set; }
+        public string Mail {  get; set; }
+        public string UniqueNotificationToken { get; set; }
         public Role Role { get; set; }
         public int Age { get; set; }
         public string Email { get; set; }

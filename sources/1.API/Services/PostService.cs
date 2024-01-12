@@ -57,6 +57,32 @@ namespace API.Services
         }
 
         /// <summary>
+        /// Gets a post by profile its identifier.
+        /// </summary>
+        /// <param name="userId">The identifier of the user.</param>
+        /// <returns>The posts with the specified user id.</returns>
+        public List<Post> GetPostByProfileId(int userId)
+        {
+            return _dbContext.Posts.Where(p => p.Publisher.Id == userId).ToList();
+        }
+
+        /// <summary>
+        /// Gets posts by category identifier with pagination.
+        /// </summary>
+        /// <param name="categoryId">The identifier of the category.</param>
+        /// <param name="index">The page index (0-based).</param>
+        /// <param name="number">The number of posts per page.</param>
+        /// <returns>The paginated list of posts with the specified category id.</returns>
+        public List<Post> GetPostsByCategoryId(int categoryId, int index, int number)
+        {
+            return _dbContext.Posts
+                .Where(p => p.Category.Id == categoryId)
+                .Skip(index * number)
+                .Take(number)
+                .ToList();
+        }
+
+        /// <summary>
         /// Updates an existing post.
         /// </summary>
         /// <param name="updatedPost">The updated post.</param>

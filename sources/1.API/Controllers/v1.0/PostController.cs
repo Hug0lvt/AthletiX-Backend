@@ -39,18 +39,6 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
-        /// Gets all posts.
-        /// </summary>
-        /// <returns>A list of all posts.</returns>
-        [HttpGet(Name = "GET - Entrypoint for get all Posts")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetAllPosts()
-        {
-            var posts = _postService.GetAllPosts();
-            return Ok(posts);
-        }
-
-        /// <summary>
         /// Gets a post by its identifier.
         /// </summary>
         /// <param name="postId">The post identifier.</param>
@@ -61,6 +49,48 @@ namespace API.Controllers.v1_0
         public IActionResult GetPostById(int postId)
         {
             var post = _postService.GetPostById(postId);
+
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(post);
+        }
+
+        /// <summary>
+        /// Gets a post by profile identifier.
+        /// </summary>
+        /// <param name="profileId">The profile identifier.</param>
+        /// <returns>The posts with the specified identifier.</returns>
+        [HttpGet("{postId}/user", Name = "GET - Entrypoint for get Post by User")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult GetPostByUser(int profileId)
+        {
+            var post = _postService.GetPostByProfileId(profileId);
+
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(post);
+        }
+
+        /// <summary>
+        /// Retrieves a paginated list of posts by category identifier.
+        /// </summary>
+        /// <param name="categoryId">The identifier of the category.</param>
+        /// <param name="index">The page index (0-based).</param>
+        /// <param name="number">The number of posts per page.</param>
+        /// <returns>An IActionResult containing the paginated list of posts with the specified category id.</returns>
+        [HttpGet("{categoryId}/category", Name = "GET - Entrypoint for retrieving posts by category")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult GetPostByCategory(int categoryId, int index, int number)
+        {
+            var post = _postService.GetPostsByCategoryId(categoryId, index, number);
 
             if (post == null)
             {
