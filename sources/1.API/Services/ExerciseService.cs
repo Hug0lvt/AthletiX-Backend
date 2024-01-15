@@ -57,6 +57,22 @@ namespace API.Services
         }
 
         /// <summary>
+        /// Gets Exercises by category identifier with pagination.
+        /// </summary>
+        /// <param name="categoryId">The identifier of the category.</param>
+        /// <param name="index">The page index (0-based).</param>
+        /// <param name="number">The number of posts per page.</param>
+        /// <returns>The paginated list of exercises with the specified category id.</returns>
+        public List<Exercise> GetExercisesByCategoryId(int categoryId, int index, int number)
+        {
+            return _dbContext.Exercises
+                .Where(e => e.Category.Id == categoryId)
+                .Skip(index * number)
+                .Take(number)
+                .ToList();
+        }
+
+        /// <summary>
         /// Updates an existing exercise.
         /// </summary>
         /// <param name="updatedExercise">The updated exercise.</param>

@@ -45,6 +45,8 @@ namespace Repositories.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Username = table.Column<string>(type: "text", nullable: false),
+                    Mail = table.Column<string>(type: "text", nullable: false),
+                    UniqueNotificationToken = table.Column<string>(type: "text", nullable: false),
                     Role = table.Column<int>(type: "integer", nullable: false),
                     Age = table.Column<int>(type: "integer", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),

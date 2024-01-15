@@ -212,8 +212,16 @@ namespace Repositories.Migrations
                     b.Property<float>("Height")
                         .HasColumnType("real");
 
+                    b.Property<string>("Mail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("Role")
                         .HasColumnType("integer");
+
+                    b.Property<string>("UniqueNotificationToken")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Username")
                         .IsRequired()

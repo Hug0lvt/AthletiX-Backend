@@ -57,6 +57,16 @@ namespace API.Services
         }
 
         /// <summary>
+        /// Gets a user profile by email identifier.
+        /// </summary>
+        /// <param name="profileEmail">The identifier of the profile.</param>
+        /// <returns>The profile with the specified identifier.</returns>
+        public Profile GetProfileByEmail(string profileEmail)
+        {
+            return _dbContext.Profiles.FirstOrDefault(p => p.Email == profileEmail);
+        }
+
+        /// <summary>
         /// Updates an existing user profile.
         /// </summary>
         /// <param name="updatedProfile">The updated profile.</param>
@@ -80,6 +90,27 @@ namespace API.Services
             _logger.LogTrace("[LOG | ProfileService] - (UpdateProfile): Profile not found");
             throw new NotFoundException("[LOG | ProfileService] - (UpdateProfile): Profile not found");
         }
+
+        /// <summary>
+        /// Updates an existing user profile.
+        /// </summary>
+        /// <param name="updatedProfile">The updated profile.</param>
+        /// <returns>The updated profile.</returns>
+        public Profile UpdateUniqueNotificationToken(Profile updatedProfile)
+        {
+            var existingProfile = _dbContext.Profiles.Find(updatedProfile.Id);
+
+            if (existingProfile != null)
+            {
+                existingProfile.UniqueNotificationToken = updatedProfile.UniqueNotificationToken;
+                _dbContext.SaveChanges();
+                return existingProfile;
+            }
+
+            _logger.LogTrace("[LOG | ProfileService] - (UpdateUniqueNotificationToken): Profile not found");
+            throw new NotFoundException("[LOG | ProfileService] - (UpdateUniqueNotificationToken): Profile not found");
+        }
+
 
         /// <summary>
         /// Deletes a user profile by its identifier.

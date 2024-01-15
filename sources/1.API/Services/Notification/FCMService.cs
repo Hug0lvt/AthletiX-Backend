@@ -1,6 +1,8 @@
 ﻿using API.Exceptions;
 using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.Logging;
+using Model;
+using Repositories;
 using System;
 using System.Threading.Tasks;
 
@@ -12,14 +14,16 @@ namespace API.Services.Notification
     public class FCMService
     {
         private readonly ILogger<FCMService> _logger;
+        private readonly ProfileService _profileService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FCMService"/> class.
         /// </summary>
         /// <param name="logger">The logger instance.</param>
-        public FCMService(ILogger<FCMService> logger)
+        public FCMService(ILogger<FCMService> logger, ProfileService profileService)
         {
             _logger = logger;
+            _profileService = profileService;
         }
 
         /// <summary>
@@ -33,7 +37,7 @@ namespace API.Services.Notification
         {
             try
             {
-                var message = new Message
+                var message = new FirebaseAdmin.Messaging.Message
                 {
                     Token = token,
                     Notification = new FirebaseAdmin.Messaging.Notification
@@ -50,6 +54,15 @@ namespace API.Services.Notification
                 _logger.LogError("[LOG | FCMService] - (SendNotification): Error sending FCM notification");
                 throw new NotificationException("[LOG | FCMService] - (SendNotification): Error sending FCM notification");
             }
+        }
+
+        public void AutomaticRefreshTokenNotification(Profile profile)
+        {
+            if(_profileService.GetProfileById(profile.Id).UniqueNotificationToken != profile.UniqueNotificationToken)
+            {
+                _profileService.UpdateUniqueNotificationToken(profile);
+            }
+
         }
     }
 }

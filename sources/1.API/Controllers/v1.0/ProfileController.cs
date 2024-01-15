@@ -39,15 +39,23 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
-        /// Gets all profiles.
+        /// Gets a profile by its identifier.
         /// </summary>
-        /// <returns>A list of all profiles.</returns>
-        [HttpGet(Name = "GET - Entrypoint for get all Profiles")]
+        /// <param name="profilEmail">The profile identifier.</param>
+        /// <returns>The profile with the specified identifier.</returns>
+        [HttpGet("/email/{profilEmail}", Name = "GET - Entrypoint for get Profile by Email")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetAllProfiles()
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult GetProfileByEmail(string profilEmail)
         {
-            var profiles = _profileService.GetAllProfiles();
-            return Ok(profiles);
+            var profile = _profileService.GetProfileByEmail(profilEmail);
+
+            if (profile == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(profile);
         }
 
         /// <summary>
