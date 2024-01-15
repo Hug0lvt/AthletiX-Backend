@@ -40,5 +40,28 @@ namespace API.Controllers.v1_0.Notification
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        /// <summary>
+        /// Sends a notification to a specific client.
+        /// </summary>
+        /// <param name="title">The title of the notification.</param>
+        /// <param name="body">The body of the notification.</param>
+        /// <param name="token">The device token of the target client.</param>
+        /// <returns>An IActionResult indicating the result of the notification sending operation.</returns>
+        [HttpPost(Name = "POST - Entrypoint for sending a notification to a specific client")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SendNotification(string title, string body, string token)
+        {
+            try
+            {
+                await _fcmService.SendNotification(title, body, token);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }

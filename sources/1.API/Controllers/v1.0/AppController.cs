@@ -9,7 +9,7 @@ namespace API.Controllers.v1_0
     /// </summary>
     [ApiVersion("1.0")]
     [ApiExplorerSettings(GroupName = "Application API")]
-    [Route("api/[controller]")]
+    [Route("api/app")]
     [ApiController]
     public class AppController : ControllerBase
     {
