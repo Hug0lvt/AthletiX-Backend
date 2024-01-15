@@ -84,7 +84,7 @@ steps:
         dockerfile: sources/1.API/Dockerfile
         context: sources/
         registry: hub.codefirst.iut.uca.fr
-        repo: hub.codefirst.iut.uca.fr/hugo.livet/Backend
+        repo: hub.codefirst.iut.uca.fr/hugo.livet/backend
         username:
           from_secret: secret-registry-username
         password:
