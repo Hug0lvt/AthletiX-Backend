@@ -84,7 +84,7 @@ steps:
         dockerfile: sources/1.API/Dockerfile
         context: sources/
         registry: hub.codefirst.iut.uca.fr
-        repo: hub.codefirst.iut.uca.fr/hugo.livet/backend
+        repo: hub.codefirst.iut.uca.fr/hugo.livet/backend-athletix
         username:
           from_secret: secret-registry-username
         password:
@@ -107,7 +107,7 @@ steps:
     - name: deploy-container-api
       image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
       environment:
-        IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/Backend:latest
+        IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/backend-athletix:latest
         CONTAINERNAME: hugo_livet_cicd_api
         COMMAND: create
         # OVERWRITE: false
