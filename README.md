@@ -7,9 +7,6 @@ Bienvenue dans le backend du projet AthletiX. Cette application backend est réa
 - [Aperçu](#aperçu)
 - [Technologies](#technologies)
 - [Installation](#installation)
-- [Usage](#usage)
-- [Contribuer](#contribuer)
-- [Licence](#licence)
 
 ## Aperçu
 
