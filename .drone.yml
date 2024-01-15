@@ -113,3 +113,5 @@ steps:
         # OVERWRITE: false
         ADMINS: hugolivet
       depends_on: [ build-image ]
+
+depends_on: [CI]
