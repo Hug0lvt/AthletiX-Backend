@@ -108,7 +108,8 @@ steps:
       image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
       environment:
         IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/backend-athletix:latest
-        CONTAINERNAME: hugo_livet_cicd_api
+        CONTAINERNAME: ath-api
         COMMAND: create
         # OVERWRITE: false
+        ADMINS: hugolivet
       depends_on: [ build-image ]
