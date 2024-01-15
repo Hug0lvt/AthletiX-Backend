@@ -63,86 +63,52 @@ volumes:
 - name: docs
   temp: {}
 
-#---
-#kind: pipeline
-#type: docker
-#name: CD
+---
+kind: pipeline
+type: docker
+name: CD
 
-#trigger :
-#    event:
-#        - push
+trigger :
+    event:
+        - push
 
-#steps:
-#    - name: verif-dockerfile
-#      image: hadolint/hadolint:latest-alpine
-#      commands:
-#        - hadolint sources/1.API/Dockerfile
-#
-#    - name: build-image
-#      image: plugins/docker
-#      settings:
-#        dockerfile: sources/1.API/Dockerfile
-#        context: sources/
-#        registry: hub.codefirst.iut.uca.fr
-#        repo: hub.codefirst.iut.uca.fr/hugo.livet/cicd_openlibraryws_wrapper
-#        username:
-#          from_secret: secret-registry-username
-#        password:
-#          from_secret: secret-registry-password
-#      depends_on: [ verif-dockerfile ]
-#
-#    - name: deploy-container-mysql
-#      image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
-#      environment:
-#          IMAGENAME: mariadb:10
-#          CONTAINERNAME: mysql
-#          COMMAND: create
-#          # OVERWRITE: false
-#          PRIVATE: true
-#          CODEFIRST_CLIENTDRONE_ENV_MARIADB_ROOT_PASSWORD:
-#            from_secret: db_root_password
-#          CODEFIRST_CLIENTDRONE_ENV_MARIADB_DATABASE:
-#            from_secret: db_database
-#          CODEFIRST_CLIENTDRONE_ENV_MARIADB_USER:
-#            from_secret: db_user
-#          CODEFIRST_CLIENTDRONE_ENV_MARIADB_PASSWORD:
-#            from_secret: db_password
-#      depends_on: [ build-image ]
+steps:
+    - name: verif-dockerfile
+      image: hadolint/hadolint:latest-alpine
+      commands:
+        - hadolint sources/1.API/Dockerfile
 
-#    - name: deploy-container
-#      image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
-#      environment:
-#        IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/cicd_openlibraryws_wrapper:latest
-#        CONTAINERNAME: hugo_livet_cicd
-#        COMMAND: create
-#        # OVERWRITE: false
-#        CODEFIRST_CLIENTDRONE_ENV_TYPE_DATA: BDD
-#        CODEFIRST_CLIENTDRONE_ENV_HOST_DB: hugolivet-mysql
-#        CODEFIRST_CLIENTDRONE_ENV_PORT_DB: 3306
-#        CODEFIRST_CLIENTDRONE_ENV_USER_DB:
-#          from_secret: db_user
-#        CODEFIRST_CLIENTDRONE_ENV_PSWD_DB:
-#          from_secret: db_password
-#        CODEFIRST_CLIENTDRONE_ENV_NAME_DB:
-#          from_secret: db_database
-#      depends_on: [ deploy-container-mysql ]
+    - name: build-image
+      image: plugins/docker
+      settings:
+        dockerfile: sources/1.API/Dockerfile
+        context: sources/
+        registry: hub.codefirst.iut.uca.fr
+        repo: hub.codefirst.iut.uca.fr/hugo.livet/Backend
+        username:
+          from_secret: secret-registry-username
+        password:
+          from_secret: secret-registry-password
+      depends_on: [ verif-dockerfile ]
+    
+    - name: ath-psql-database
+      image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
+      environment:
+          IMAGENAME: postgres:16.1-alpine3.19
+          CONTAINERNAME: ath-psql-database
+          COMMAND: create
+          # OVERWRITE: false
+          PRIVATE: true
+          CODEFIRST_CLIENTDRONE_ENV_POSTGRES_PASSWORD:
+            from_secret: db_password
+          ADMINS: hugolivet
+      depends_on: [ build-image ]
 
-#    - name: deploy-container-stub
-#      image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
-#      environment:
-#        IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/cicd_openlibraryws_wrapper:latest
-#        CONTAINERNAME: hugo_livet_cicd_stub
-#        COMMAND: create
-#        # OVERWRITE: false
-#        CODEFIRST_CLIENTDRONE_ENV_TYPE_DATA: STUB
-#      depends_on: [ build-image ]
-
-#    - name: deploy-container-api
-#      image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
-#      environment:
-#        IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/cicd_openlibraryws_wrapper:latest
-#        CONTAINERNAME: hugo_livet_cicd_api
-#        COMMAND: create
-#        # OVERWRITE: false
-#        CODEFIRST_CLIENTDRONE_ENV_TYPE_DATA: API
-#      depends_on: [ build-image ]
+    - name: deploy-container-api
+      image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
+      environment:
+        IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/Backend:latest
+        CONTAINERNAME: hugo_livet_cicd_api
+        COMMAND: create
+        # OVERWRITE: false
+      depends_on: [ build-image ]
