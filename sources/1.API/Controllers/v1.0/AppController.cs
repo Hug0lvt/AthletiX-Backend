@@ -17,7 +17,7 @@ namespace API.Controllers.v1_0
         /// Gets the version of the application.
         /// </summary>
         /// <returns>The version of the application.</returns>
-        [HttpGet(Name = "GET Back Version")]
+        [HttpGet("/version", Name = "GET Back Version")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<string> GetVersion()
         {
