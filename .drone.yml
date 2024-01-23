@@ -101,7 +101,7 @@ steps:
           PRIVATE: true
           CODEFIRST_CLIENTDRONE_ENV_POSTGRES_PASSWORD:
             from_secret: db_password
-          ADMINS: hugolivet
+          ADMINS: hugolivet,alexandreglenat,mohamedhassani,zakariyasaoula
       depends_on: [ build-image ]
 
     - name: deploy-container-api
