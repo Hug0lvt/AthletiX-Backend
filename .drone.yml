@@ -111,7 +111,7 @@ steps:
         CONTAINERNAME: ath-api
         COMMAND: create
         # OVERWRITE: false
-        ADMINS: hugolivet
+        ADMINS: hugolivet,alexandreglenat,mohamedhassani,zakariyasaoula
       depends_on: [ build-image ]
 
 depends_on: [CI]
