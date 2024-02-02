@@ -104,18 +104,6 @@ steps:
           ADMINS: hugolivet,alexandreglenat,mohamedhassani,zakariyasaoula
       depends_on: [ build-image ]
 
-    - name: deploy-container-mysql_MariaDB_WebAPI
-      image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
-      environment:
-        IMAGENAME: mariadb:10
-        CONTAINERNAME: MariaDB_WebAPI
-        COMMAND: create
-        PRIVATE: true
-        CODEFIRST_CLIENTDRONE_ENV_MARIADB_PASSWORD:
-          from_secret: SECRET_DB_PASSWORD
-        ADMINS: hugolivet,alexandreglenat,mohamedhassani,zakariyasaoula
-
-
     - name: deploy-container-api
       image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
       environment:
