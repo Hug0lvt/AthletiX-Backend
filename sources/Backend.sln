@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "3_Model", "3.Model\3_Model.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "4_Shared", "4.Shared\4_Shared.csproj", "{E9501C82-EC2B-4644-BC5A-0241BA46789A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "5_TestsUnitaires", "5_TestsUnitaires\5_TestsUnitaires.csproj", "{A11688C8-044E-4CF0-8FF2-56B6167E1BE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "5_TestsUnitaires", "5_TestsUnitaires\5_TestsUnitaires.csproj", "{A11688C8-044E-4CF0-8FF2-56B6167E1BE8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

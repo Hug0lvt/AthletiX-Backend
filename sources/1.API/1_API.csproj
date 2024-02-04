@@ -7,7 +7,6 @@
     <InvariantGlobalization>true</InvariantGlobalization>
     <RootNamespace>API</RootNamespace>
     <UserSecretsId>d0d442f5-60d5-4113-8349-ad105e908d13</UserSecretsId>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
