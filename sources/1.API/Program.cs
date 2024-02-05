@@ -110,7 +110,7 @@ app.UseSwagger();// NE PAS LAISSER EN PROD
 app.UseSwaggerUI();// NE PAS LAISSER EN PROD
 #endregion
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection(); //Casser avec Codefirst
 
 app.UseAuthorization();
 
