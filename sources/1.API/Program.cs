@@ -15,26 +15,24 @@ builder.Configuration.AddJsonFile("appsettings.json");
 var configuration = builder.Configuration;
 #endregion
 
-#region ENV_VARS
-//SGBD :
-string? typedata = Environment.GetEnvironmentVariable("SGBD", EnvironmentVariableTarget.Process);
-
-//PG_SGBD
-string? host = Environment.GetEnvironmentVariable("SGBD_HOST", EnvironmentVariableTarget.Process);
-string? port = Environment.GetEnvironmentVariable("SGBD_PORT", EnvironmentVariableTarget.Process);
-string? user = Environment.GetEnvironmentVariable("SGBD_USER", EnvironmentVariableTarget.Process);
-string? pass = Environment.GetEnvironmentVariable("SGBD_PSWD", EnvironmentVariableTarget.Process);
-string? name = Environment.GetEnvironmentVariable("SGBD_NAME", EnvironmentVariableTarget.Process);
-#endregion
-
 #region SWITCH DATABASE
+string typedata = "";
+typedata = Environment.GetEnvironmentVariable("SGBD", EnvironmentVariableTarget.Process);
 switch (typedata)
 {
     case "PG_SGBD":
+        Console.WriteLine("SGBD : PostgreSql - variables d'environement");
+        string? host = Environment.GetEnvironmentVariable("SGBD_HOST", EnvironmentVariableTarget.Process);
+        string? port = Environment.GetEnvironmentVariable("SGBD_PORT", EnvironmentVariableTarget.Process);
+        string? user = Environment.GetEnvironmentVariable("SGBD_USER", EnvironmentVariableTarget.Process);
+        string? pass = Environment.GetEnvironmentVariable("SGBD_PSWD", EnvironmentVariableTarget.Process);
+        string? name = Environment.GetEnvironmentVariable("SGBD_NAME", EnvironmentVariableTarget.Process);
+        if (host == null || port == null || user == null || pass == null || name == null) throw new ArgumentNullException("PG_SGBD : il manque des variables d'environement !");
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql($"Host={host};Port={port};Database={name};Username={user};Password={pass};"));
         break;
     default:
+        Console.WriteLine("SGBD : PostgreSql - connexion par defaut");
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
         break;
