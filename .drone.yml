@@ -94,17 +94,17 @@ steps:
     - name: ath-psql-database
       image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
       environment:
-          IMAGENAME: codefirst.iut.uca.fr/hugo.livet/database-athletix:latest
+          IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/database-athletix:latest
           CONTAINERNAME: ath-psql-database
           COMMAND: create
           # OVERWRITE: false
           PRIVATE: true
-          CODEFIRST_CLIENTDRONE_ENV_POSTGRES_PASSWORD:
-            from_secret: db_password
-          CODEFIRST_CLIENTDRONE_ENV_POSTGRES_USER:
-            from_secret: db_user
-          CODEFIRST_CLIENTDRONE_ENV_POSTGRES_DB:
-            from_secret: db_database
+          #CODEFIRST_CLIENTDRONE_ENV_POSTGRES_PASSWORD:
+            #from_secret: db_password
+          #CODEFIRST_CLIENTDRONE_ENV_POSTGRES_USER:
+            #from_secret: db_user
+          #CODEFIRST_CLIENTDRONE_ENV_POSTGRES_DB:
+            #from_secret: db_database
           ADMINS: hugolivet,alexandreglenat,mohamedhassani,zakariyasaoula
       depends_on: [ build-image ]
 
