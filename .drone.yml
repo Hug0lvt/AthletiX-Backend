@@ -112,9 +112,12 @@ steps:
         CODEFIRST_CLIENTDRONE_ENV_SGBD: PG_SGBD
         CODEFIRST_CLIENTDRONE_ENV_SGBD_HOST: AthletiX-ath-psql-database
         CODEFIRST_CLIENTDRONE_ENV_SGBD_PORT: 5432
-        CODEFIRST_CLIENTDRONE_ENV_SGBD_USER: postgres
-        CODEFIRST_CLIENTDRONE_ENV_SGBD_PSWD: POSTGRES_PASSWORD
-        CODEFIRST_CLIENTDRONE_ENV_SGBD_NAME: athletix-back
+        CODEFIRST_CLIENTDRONE_ENV_SGBD_USER:
+          from_secret: db_user
+        CODEFIRST_CLIENTDRONE_ENV_SGBD_PSWD:
+          from_secret: db_password
+        CODEFIRST_CLIENTDRONE_ENV_SGBD_NAME:
+          from_secret: db_database
         ADMINS: hugolivet,alexandreglenat,mohamedhassani,zakariyasaoula
       depends_on: [ build-image ]
 
