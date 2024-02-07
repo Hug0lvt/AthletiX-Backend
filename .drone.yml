@@ -98,7 +98,7 @@ steps:
           CONTAINERNAME: ath-psql-database
           COMMAND: create
           # OVERWRITE: false
-          #PRIVATE: true
+          PRIVATE: true
           ADMINS: hugolivet,alexandreglenat,mohamedhassani,zakariyasaoula
       depends_on: [ build-image ]
 
