@@ -1,15 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Repositories
+namespace API.Repositories
 {
-    public class AppDbContext : DbContext
+    public class IdentityAppDbContext : IdentityDbContext<AppUser>
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -21,12 +16,14 @@ namespace Repositories
         public DbSet<Session> Sessions { get; set; }
         public DbSet<Set> Sets { get; set; }
 
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
+        public IdentityAppDbContext(DbContextOptions<IdentityAppDbContext> options) : base(options)
         {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             // Configure Category
             modelBuilder.Entity<Category>().HasKey(c => c.Id);
             modelBuilder.Entity<Category>().Property(c => c.Title).IsRequired();
@@ -83,6 +80,5 @@ namespace Repositories
             modelBuilder.Entity<Conversation>().HasMany(c => c.Messages).WithOne();
             modelBuilder.Entity<Session>().HasMany(s => s.Exercises).WithOne();
         }
-
     }
 }

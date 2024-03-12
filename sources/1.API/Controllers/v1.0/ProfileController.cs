@@ -2,6 +2,7 @@
 using API.Services;
 using Model;
 using API.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers.v1_0
 {
@@ -12,6 +13,7 @@ namespace API.Controllers.v1_0
     [ApiExplorerSettings(GroupName = "Profile APIs")]
     [ApiController]
     [Route("api/profiles")]
+    [Authorize]
     public class ProfileController : ControllerBase
     {
         private readonly ProfileService _profileService;

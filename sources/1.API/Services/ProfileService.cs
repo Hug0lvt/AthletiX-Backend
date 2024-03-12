@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using Repositories;
 using API.Exceptions;
+using API.Repositories;
 
 namespace API.Services
 {
@@ -12,14 +12,14 @@ namespace API.Services
     public class ProfileService
     {
         private readonly ILogger<ProfileService> _logger;
-        private readonly AppDbContext _dbContext;
+        private readonly IdentityAppDbContext _dbContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public ProfileService(AppDbContext dbContext, ILogger<ProfileService> logger)
+        public ProfileService(IdentityAppDbContext dbContext, ILogger<ProfileService> logger)
         {
             _dbContext = dbContext;
             _logger = logger;

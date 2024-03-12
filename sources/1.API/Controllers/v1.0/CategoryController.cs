@@ -2,6 +2,7 @@
 using API.Services;
 using Model;
 using API.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers.v1_0
 {
@@ -12,6 +13,7 @@ namespace API.Controllers.v1_0
     [ApiExplorerSettings(GroupName = "Category APIs")]
     [ApiController]
     [Route("api/categories")]
+    [Authorize]
     public class CategoryController : ControllerBase
     {
         private readonly CategoryService _categoryService;

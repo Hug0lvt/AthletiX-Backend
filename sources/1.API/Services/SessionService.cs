@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using Repositories;
 using API.Exceptions;
+using API.Repositories;
 
 namespace API.Services
 {
@@ -12,14 +12,14 @@ namespace API.Services
     public class SessionService
     {
         private readonly ILogger<SessionService> _logger;
-        private readonly AppDbContext _dbContext;
+        private readonly IdentityAppDbContext _dbContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public SessionService(AppDbContext dbContext, ILogger<SessionService> logger)
+        public SessionService(IdentityAppDbContext dbContext, ILogger<SessionService> logger)
         {
             _dbContext = dbContext;
             _logger = logger;

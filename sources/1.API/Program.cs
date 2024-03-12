@@ -1,12 +1,13 @@
 using API.Services;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Repositories;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using API.Services.Notification;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,16 +29,24 @@ switch (typedata)
         string? pass = Environment.GetEnvironmentVariable("SGBD_PSWD", EnvironmentVariableTarget.Process);
         string? name = Environment.GetEnvironmentVariable("SGBD_NAME", EnvironmentVariableTarget.Process);
         if (host == null || port == null || user == null || pass == null || name == null) throw new ArgumentNullException("PG_SGBD : il manque des variables d'environement !");
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql($"Host={host};Port={port};Database={name};Username={user};Password={pass};"));
+        builder.Services.AddDbContext<IdentityAppDbContext>(options =>
+           options.UseNpgsql($"Host={host};Port={port};Database={name};Username={user};Password={pass};"));
         break;
     default:
         Console.WriteLine("SGBD : PostgreSql - connexion par defaut");
-        builder.Services.AddDbContext<AppDbContext>(options =>
+        builder.Services.AddDbContext<IdentityAppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
         break;
 
 }
+#endregion
+
+#region Authentification
+builder.Services.AddAuthentication().AddBearerToken(IdentityConstants.BearerScheme);
+builder.Services.AddAuthorizationBuilder();
+
+builder.Services.AddIdentityCore<AppUser>().AddEntityFrameworkStores<IdentityAppDbContext>().AddApiEndpoints();
+
 #endregion
 
 #region Logging
@@ -83,6 +92,24 @@ builder.Services.AddSwaggerGen(opts =>
 
     opts.OrderActionsBy(api => api.RelativePath);
     opts.UseInlineDefinitionsForEnums();
+
+    opts.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+
+    opts.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            new string[] { }
+        }
+    });
 });
 
 builder.Services.AddApiVersioning(o =>
@@ -111,7 +138,8 @@ app.UseSwaggerUI();// NE PAS LAISSER EN PROD
 //app.UseHttpsRedirection(); //Casser avec Codefirst
 
 app.UseAuthorization();
-
+app.MapIdentityApi<AppUser>();
 app.MapControllers();
 
 app.Run();
+

@@ -2,6 +2,7 @@
 using API.Services;
 using Model;
 using API.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers.v1_0
 {
@@ -12,6 +13,7 @@ namespace API.Controllers.v1_0
     [ApiExplorerSettings(GroupName = "Message APIs")]
     [ApiController]
     [Route("api/messages")]
+    [Authorize]
     public class MessageController : ControllerBase
     {
         private readonly MessageService _messageService;

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using Repositories;
 using API.Exceptions;
+using API.Repositories;
 
 namespace API.Services
 {
@@ -12,14 +12,14 @@ namespace API.Services
     public class ExerciseService
     {
         private readonly ILogger<ExerciseService> _logger;
-        private readonly AppDbContext _dbContext;
+        private readonly IdentityAppDbContext _dbContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExerciseService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public ExerciseService(AppDbContext dbContext, ILogger<ExerciseService> logger)
+        public ExerciseService(IdentityAppDbContext dbContext, ILogger<ExerciseService> logger)
         {
             _dbContext = dbContext;
             _logger = logger;

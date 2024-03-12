@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Repositories;
 
 namespace API.Controllers.v1_0
 {
@@ -11,6 +11,7 @@ namespace API.Controllers.v1_0
     [ApiExplorerSettings(GroupName = "Application API")]
     [Route("api/app")]
     [ApiController]
+    [Authorize]
     public class AppController : ControllerBase
     {
         /// <summary>
