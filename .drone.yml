@@ -76,12 +76,12 @@ steps:
     - name: verif-dockerfile
       image: hadolint/hadolint:latest-alpine
       commands:
-        - hadolint sources/1.API/Dockerfile
+        - hadolint sources/Dockerfile
 
     - name: build-image
       image: plugins/docker
       settings:
-        dockerfile: sources/1.API/Dockerfile
+        dockerfile: sources/Dockerfile
         context: sources/
         registry: hub.codefirst.iut.uca.fr
         repo: hub.codefirst.iut.uca.fr/hugo.livet/backend-athletix
@@ -94,13 +94,11 @@ steps:
     - name: ath-psql-database
       image: hub.codefirst.iut.uca.fr/thomas.bellembois/codefirst-dockerproxy-clientdrone:latest
       environment:
-          IMAGENAME: postgres:16.1-alpine3.19
+          IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/database-athletix:latest
           CONTAINERNAME: ath-psql-database
           COMMAND: create
           # OVERWRITE: false
-          #PRIVATE: true
-          CODEFIRST_CLIENTDRONE_ENV_POSTGRES_PASSWORD:
-            from_secret: db_password
+          PRIVATE: true
           ADMINS: hugolivet,alexandreglenat,mohamedhassani,zakariyasaoula
       depends_on: [ build-image ]
 
@@ -110,7 +108,16 @@ steps:
         IMAGENAME: hub.codefirst.iut.uca.fr/hugo.livet/backend-athletix:latest
         CONTAINERNAME: ath-api
         COMMAND: create
-        # OVERWRITE: false
+        #OVERWRITE: false
+        CODEFIRST_CLIENTDRONE_ENV_SGBD: PG_SGBD
+        CODEFIRST_CLIENTDRONE_ENV_SGBD_HOST: AthletiX-ath-psql-database
+        CODEFIRST_CLIENTDRONE_ENV_SGBD_PORT: 5432
+        CODEFIRST_CLIENTDRONE_ENV_SGBD_USER:
+          from_secret: db_user
+        CODEFIRST_CLIENTDRONE_ENV_SGBD_PSWD:
+          from_secret: db_password
+        CODEFIRST_CLIENTDRONE_ENV_SGBD_NAME:
+          from_secret: db_database
         ADMINS: hugolivet,alexandreglenat,mohamedhassani,zakariyasaoula
       depends_on: [ build-image ]
 

@@ -2,7 +2,6 @@ using API.Services;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using Repositories;
 using FirebaseAdmin;
@@ -11,18 +10,41 @@ using API.Services.Notification;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuration
+#region Configuration
 builder.Configuration.AddJsonFile("appsettings.json");
 var configuration = builder.Configuration;
+#endregion
 
-//Database
-builder.Services.AddDbContext<AppDbContext>(options =>
+#region SWITCH DATABASE
+string typedata = "";
+typedata = Environment.GetEnvironmentVariable("SGBD", EnvironmentVariableTarget.Process);
+switch (typedata)
+{
+    case "PG_SGBD":
+        Console.WriteLine("SGBD : PostgreSql - variables d'environement");
+        string? host = Environment.GetEnvironmentVariable("SGBD_HOST", EnvironmentVariableTarget.Process);
+        string? port = Environment.GetEnvironmentVariable("SGBD_PORT", EnvironmentVariableTarget.Process);
+        string? user = Environment.GetEnvironmentVariable("SGBD_USER", EnvironmentVariableTarget.Process);
+        string? pass = Environment.GetEnvironmentVariable("SGBD_PSWD", EnvironmentVariableTarget.Process);
+        string? name = Environment.GetEnvironmentVariable("SGBD_NAME", EnvironmentVariableTarget.Process);
+        if (host == null || port == null || user == null || pass == null || name == null) throw new ArgumentNullException("PG_SGBD : il manque des variables d'environement !");
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql($"Host={host};Port={port};Database={name};Username={user};Password={pass};"));
+        break;
+    default:
+        Console.WriteLine("SGBD : PostgreSql - connexion par defaut");
+        builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        break;
 
-//Logging
+}
+#endregion
+
+#region Logging
 builder.Services.AddLogging(builder => builder.AddConsole());
+#endregion
 
-//Injection de dependance
+#region Dependency Injection
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<CommentService>();
 builder.Services.AddScoped<ConversationService>();
@@ -32,15 +54,17 @@ builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<SetService>();
+#endregion
 
-//Notifications
-builder.Services.AddScoped<FCMService>();
+#region Firebase Tools
 FirebaseApp.Create(new AppOptions()//TODO ggkey.json à UPDATE (pas le bon)
 {
     Credential = GoogleCredential.FromFile("ggkey.json"),
 });
+builder.Services.AddScoped<FCMService>(); //Notifications
+#endregion
 
-//API And Swagger
+#region API And Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opts =>
@@ -70,16 +94,21 @@ builder.Services.AddApiVersioning(o =>
         new QueryStringApiVersionReader("api-version"),
         new HeaderApiVersionReader("X-Version"));
 });
+#endregion
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+#region Use Swagger
+/*if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+}*/
+app.UseSwagger();// NE PAS LAISSER EN PROD
+app.UseSwaggerUI();// NE PAS LAISSER EN PROD
+#endregion
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection(); //Casser avec Codefirst
 
 app.UseAuthorization();
 
