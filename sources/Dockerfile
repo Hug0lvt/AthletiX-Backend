@@ -9,7 +9,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["1.API/1_API.csproj", "1.API/"]
-COPY ["2.Repositories/2_Repositories.csproj", "2.Repositories/"]
 COPY ["3.Model/3_Model.csproj", "3.Model/"]
 COPY ["4.Shared/4_Shared.csproj", "4.Shared/"]
 RUN dotnet restore "./1.API/./1_API.csproj"

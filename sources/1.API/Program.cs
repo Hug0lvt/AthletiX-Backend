@@ -110,6 +110,10 @@ builder.Services.AddSwaggerGen(opts =>
             new string[] { }
         }
     });
+
+    opts.AddServer(new OpenApiServer { Url = "https://codefirst.iut.uca.fr/containers/AthletiX-ath-api" });
+    opts.AddServer(new OpenApiServer { Url = "http://localhost:5020" });
+    opts.AddServer(new OpenApiServer { Url = "https://localhost:7028" });
 });
 
 builder.Services.AddApiVersioning(o =>
