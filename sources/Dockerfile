@@ -8,19 +8,19 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["1.API/1_API.csproj", "1.API/"]
-COPY ["3.Model/3_Model.csproj", "3.Model/"]
-COPY ["4.Shared/4_Shared.csproj", "4.Shared/"]
-RUN dotnet restore "./1.API/./1_API.csproj"
+COPY ["API/API.csproj", "API/"]
+COPY ["Model/Model.csproj", "Model/"]
+COPY ["Shared/Shared.csproj", "Shared/"]
+RUN dotnet restore "./API/./API.csproj"
 COPY . .
-WORKDIR "/src/1.API"
-RUN dotnet build "./1_API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/API"
+RUN dotnet build "./API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./1_API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "1_API.dll"]
+ENTRYPOINT ["dotnet", "API.dll"]
