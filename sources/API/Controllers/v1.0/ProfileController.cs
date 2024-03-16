@@ -45,7 +45,7 @@ namespace API.Controllers.v1_0
         /// </summary>
         /// <param name="profilEmail">The profile identifier.</param>
         /// <returns>The profile with the specified identifier.</returns>
-        [HttpGet("/email/{profilEmail}", Name = "GET - Entrypoint for get Profile by Email")]
+        [HttpGet("email/{profilEmail}", Name = "GET - Entrypoint for get Profile by Email")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetProfileByEmail(string profilEmail)
