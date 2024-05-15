@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Model;
 using API.Exceptions;
 using API.Repositories;
+using Shared.Mappers;
 
 namespace API.Services
 {
@@ -44,6 +45,28 @@ namespace API.Services
         public List<Comment> GetAllComments()
         {
             return _dbContext.Comments.ToList();
+        }
+
+        /// <summary>
+        /// Gets all comments (with pages).
+        /// </summary>
+        /// <returns>A list of all comments.</returns>
+        public PaginationResult<Comment> GetAllCommentsWithPages(
+            int pageSize = 10,
+            int pageNumber = 0)
+        {
+            var totalItems = _dbContext.Comments.Count();
+            var items = _dbContext.Comments
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PaginationResult<Comment>
+            {
+                Items = items,
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
         }
 
         /// <summary>

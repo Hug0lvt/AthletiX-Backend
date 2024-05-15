@@ -53,6 +53,20 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets all Message with pages.
+        /// </summary>
+        /// <returns>A list of all Message.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Messages with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllMessagesWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
+        {
+            var categories = _messageService.GetAllMessagesWithPages(pageSize, pageNumber);
+            return Ok(categories);
+        }
+
+        /// <summary>
         /// Gets a message by its identifier.
         /// </summary>
         /// <param name="messageId">The message identifier.</param>

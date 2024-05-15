@@ -53,6 +53,20 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets all Sets with pages.
+        /// </summary>
+        /// <returns>A list of all Sets.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Sets with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllSetsWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
+        {
+            var categories = _setService.GetAllSetsWithPages(pageSize, pageNumber);
+            return Ok(categories);
+        }
+
+        /// <summary>
         /// Gets a set by its identifier.
         /// </summary>
         /// <param name="setId">The set identifier.</param>

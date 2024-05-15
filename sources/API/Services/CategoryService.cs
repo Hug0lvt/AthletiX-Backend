@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Model;
 using API.Exceptions;
 using API.Repositories;
+using Shared.Mappers;
 
 namespace API.Services
 {
@@ -44,6 +45,28 @@ namespace API.Services
         public List<Category> GetAllCategories()
         {
             return _dbContext.Categories.ToList();
+        }
+
+        /// <summary>
+        /// Gets all categories (with pages).
+        /// </summary>
+        /// <returns>A list of all categories.</returns>
+        public PaginationResult<Category> GetAllCategoriesWithPages(
+            int pageSize = 10,
+            int pageNumber = 0)
+        {
+            var totalItems = _dbContext.Categories.Count();
+            var items = _dbContext.Categories
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PaginationResult<Category>
+            {
+                Items = items,
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
         }
 
         /// <summary>

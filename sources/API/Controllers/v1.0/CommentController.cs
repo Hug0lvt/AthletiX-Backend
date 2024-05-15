@@ -53,6 +53,20 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets all comments.
+        /// </summary>
+        /// <returns>A list of all comments.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Comments with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllCommentsWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
+        {
+            var comments = _commentService.GetAllCommentsWithPages(pageSize, pageNumber);
+            return Ok(comments);
+        }
+
+        /// <summary>
         /// Gets a comment by its identifier.
         /// </summary>
         /// <param name="commentId">The comment identifier.</param>

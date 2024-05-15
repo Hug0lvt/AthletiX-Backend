@@ -53,6 +53,20 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets all Conversations with pages.
+        /// </summary>
+        /// <returns>A list of all Conversations.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Conversations with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllConversationsWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
+        {
+            var categories = _conversationService.GetAllConversationsWithPages(pageSize, pageNumber);
+            return Ok(categories);
+        }
+
+        /// <summary>
         /// Gets a conversation by its identifier.
         /// </summary>
         /// <param name="conversationId">The conversation identifier.</param>

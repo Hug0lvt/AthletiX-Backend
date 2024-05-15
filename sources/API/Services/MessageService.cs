@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Model;
 using API.Exceptions;
 using API.Repositories;
+using Shared.Mappers;
 
 namespace API.Services
 {
@@ -44,6 +45,28 @@ namespace API.Services
         public List<Message> GetAllMessages()
         {
             return _dbContext.Messages.ToList();
+        }
+
+        /// <summary>
+        /// Gets all Message (with pages).
+        /// </summary>
+        /// <returns>A list of all Message.</returns>
+        public PaginationResult<Message> GetAllMessagesWithPages(
+            int pageSize = 10,
+            int pageNumber = 0)
+        {
+            var totalItems = _dbContext.Messages.Count();
+            var items = _dbContext.Messages
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PaginationResult<Message>
+            {
+                Items = items,
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
         }
 
         /// <summary>

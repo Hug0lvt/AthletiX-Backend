@@ -53,6 +53,20 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets all categories with pages.
+        /// </summary>
+        /// <returns>A list of all categories.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Categories with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllCategoriesWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
+        {
+            var categories = _categoryService.GetAllCategoriesWithPages(pageSize, pageNumber);
+            return Ok(categories);
+        }
+
+        /// <summary>
         /// Gets a category by its identifier.
         /// </summary>
         /// <param name="categoryId">The category identifier.</param>

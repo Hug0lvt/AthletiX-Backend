@@ -41,6 +41,20 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets all Exercise with pages.
+        /// </summary>
+        /// <returns>A list of all Exercise.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Exercise with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllExerciseWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
+        {
+            var categories = _exerciseService.GetAllExercisesWithPages(pageSize, pageNumber);
+            return Ok(categories);
+        }
+
+        /// <summary>
         /// Gets an exercise by its identifier.
         /// </summary>
         /// <param name="exerciseId">The exercise identifier.</param>
@@ -67,7 +81,7 @@ namespace API.Controllers.v1_0
         /// <param name="index">The page index (0-based).</param>
         /// <param name="number">The number of exercises per page.</param>
         /// <returns>An IActionResult containing the paginated list of exercises with the specified category id.</returns>
-        [HttpGet("{categoryId}/category", Name = "GET - Entrypoint for retrieving exercises by category")]
+        [HttpGet("category/{categoryId}", Name = "GET - Entrypoint for retrieving exercises by category")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetExerciseByCategory(int categoryId, int index, int number)

@@ -65,19 +65,19 @@ namespace API.Controllers.v1_0
         /// </summary>
         /// <param name="profileId">The profile identifier.</param>
         /// <returns>The posts with the specified identifier.</returns>
-        [HttpGet("{postId}/user", Name = "GET - Entrypoint for get Post by User")]
+        [HttpGet("user/{profileId}", Name = "GET - Entrypoint for get Post by User")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetPostByUser(int profileId)
         {
-            var post = _postService.GetPostByProfileId(profileId);
+            var posts = _postService.GetPostByProfileId(profileId);
 
-            if (post == null)
+            if (posts == null)
             {
                 return NotFound();
             }
 
-            return Ok(post);
+            return Ok(posts);
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace API.Controllers.v1_0
         /// <param name="index">The page index (0-based).</param>
         /// <param name="number">The number of posts per page.</param>
         /// <returns>An IActionResult containing the paginated list of posts with the specified category id.</returns>
-        [HttpGet("{categoryId}/category", Name = "GET - Entrypoint for retrieving posts by category")]
+        [HttpGet("category/{categoryId}", Name = "GET - Entrypoint for retrieving posts by category")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetPostByCategory(int categoryId, int index, int number)

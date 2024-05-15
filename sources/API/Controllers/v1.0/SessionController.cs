@@ -53,6 +53,20 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets all Session with pages.
+        /// </summary>
+        /// <returns>A list of all Session.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Sessions with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllSessionsWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
+        {
+            var categories = _sessionService.GetAllSessionsWithPages(pageSize, pageNumber);
+            return Ok(categories);
+        }
+
+        /// <summary>
         /// Gets a session by its identifier.
         /// </summary>
         /// <param name="sessionId">The session identifier.</param>

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Model;
 using API.Exceptions;
 using API.Repositories;
+using Shared.Mappers;
 
 namespace API.Services
 {
@@ -44,6 +45,28 @@ namespace API.Services
         public List<Set> GetAllSets()
         {
             return _dbContext.Sets.ToList();
+        }
+
+        /// <summary>
+        /// Gets all Sets (with pages).
+        /// </summary>
+        /// <returns>A list of all Sets.</returns>
+        public PaginationResult<Set> GetAllSetsWithPages(
+            int pageSize = 10,
+            int pageNumber = 0)
+        {
+            var totalItems = _dbContext.Sets.Count();
+            var items = _dbContext.Sets
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PaginationResult<Set>
+            {
+                Items = items,
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
         }
 
         /// <summary>
