@@ -9,6 +9,7 @@ namespace Model
     public class Comment
     {
         public int Id { get; set; }
+        // TODO POST ID
         public DateTime PublishDate { get; set; }
         public Profile Publisher { get; set; }
         public string Content { get; set; }

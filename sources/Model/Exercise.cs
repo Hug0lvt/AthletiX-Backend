@@ -9,10 +9,11 @@ namespace Model
     public class Exercise
     {
         public int Id { get; set; }
+        // TODO SessionId
         public string Name { get; set; }
         public string Description { get; set; }
         public string Image { get; set; }
         public Category Category { get; set; }
-        public List<Set> Sets { get; set; } = new List<Set>();
+        public List<Set> Sets { get; set; } = new List<Set>(); // TODO rm
     }
 }

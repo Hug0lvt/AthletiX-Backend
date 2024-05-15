@@ -10,6 +10,7 @@ namespace Model
     public class Set
     {
         public int Id { get; set; }
+        // TODO SessionId
         public int Reps { get; set; }
         public List<float> Weight { get; set; } = new List<float>();
         public TimeSpan Rest { get; set; }

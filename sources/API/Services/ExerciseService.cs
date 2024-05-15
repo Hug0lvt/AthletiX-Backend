@@ -70,6 +70,25 @@ namespace API.Services
         }
 
         /// <summary>
+        /// Gets all Exercise from category (with pages).
+        /// </summary>
+        /// <returns>A list of all Exercise in category.</returns>
+        public PaginationResult<Exercise> GetExercisesFromCategory(int categoryId)
+        {
+            var items = _dbContext.Exercises
+                .Where(q => q.Category.Id == categoryId)
+                .ToList();
+            var totalItems = items.Count();
+
+            return new PaginationResult<Exercise>
+            {
+                Items = items,
+                NextPage = -1,
+                TotalItems = totalItems
+            };
+        }
+
+        /// <summary>
         /// Gets an exercise by its identifier.
         /// </summary>
         /// <param name="exerciseId">The identifier of the exercise.</param>
@@ -77,22 +96,6 @@ namespace API.Services
         public Exercise GetExerciseById(int exerciseId)
         {
             return _dbContext.Exercises.FirstOrDefault(e => e.Id == exerciseId);
-        }
-
-        /// <summary>
-        /// Gets Exercises by category identifier with pagination.
-        /// </summary>
-        /// <param name="categoryId">The identifier of the category.</param>
-        /// <param name="index">The page index (0-based).</param>
-        /// <param name="number">The number of posts per page.</param>
-        /// <returns>The paginated list of exercises with the specified category id.</returns>
-        public List<Exercise> GetExercisesByCategoryId(int categoryId, int index, int number)
-        {
-            return _dbContext.Exercises
-                .Where(e => e.Category.Id == categoryId)
-                .Skip(index * number)
-                .Take(number)
-                .ToList();
         }
 
         /// <summary>

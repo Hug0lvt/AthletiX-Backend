@@ -70,6 +70,25 @@ namespace API.Services
         }
 
         /// <summary>
+        /// Gets all comments for a post.
+        /// </summary>
+        /// <returns>A list of all comments for one post.</returns>
+        /*public PaginationResult<Comment> GetAllCommentsOnPost(int postId)
+        {
+            
+            var items = _dbContext.Comments.Where(q => q.P)
+                .ToList();
+            var totalItems = items.Count();
+
+            return new PaginationResult<Comment>
+            {
+                Items = items,
+                NextPage = -1,
+                TotalItems = totalItems
+            };
+        }*/
+
+        /// <summary>
         /// Gets a comment by its identifier.
         /// </summary>
         /// <param name="commentId">The identifier of the comment.</param>

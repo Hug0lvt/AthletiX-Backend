@@ -70,6 +70,27 @@ namespace API.Services
         }
 
         /// <summary>
+        /// Gets user conversations.
+        /// </summary>
+        /// <returns>A list of user conversations.</returns>
+        public PaginationResult<Conversation> GetConversationsForUser(int userId)
+        {
+            
+            var items = _dbContext.Conversations
+                .Where(q => q.Profiles.Any(p => p.Id == userId))
+                .ToList();
+
+            var totalItems = items.Count();
+
+            return new PaginationResult<Conversation>
+            {
+                Items = items,
+                NextPage = -1,
+                TotalItems = totalItems
+            };
+        }
+
+        /// <summary>
         /// Gets a conversation by its identifier.
         /// </summary>
         /// <param name="conversationId">The identifier of the conversation.</param>

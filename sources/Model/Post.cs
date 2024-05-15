@@ -17,7 +17,7 @@ namespace Model
         public string Description { get; set; }
         public PublicationType PublicationType { get; set; }
         public string Content { get; set; }
-        public List<Comment> Comments { get; set; } = new List<Comment>();
+        public List<Comment> Comments { get; set; } = new List<Comment>(); // TODO a rm
 
     }
 }

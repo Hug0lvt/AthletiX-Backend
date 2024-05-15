@@ -62,8 +62,8 @@ namespace API.Controllers.v1_0
             [FromQuery] int pageSize = 10,
             [FromQuery] int pageNumber = 0)
         {
-            var categories = _messageService.GetAllMessagesWithPages(pageSize, pageNumber);
-            return Ok(categories);
+            var messages = _messageService.GetAllMessagesWithPages(pageSize, pageNumber);
+            return Ok(messages);
         }
 
         /// <summary>

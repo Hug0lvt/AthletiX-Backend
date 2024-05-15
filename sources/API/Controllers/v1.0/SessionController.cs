@@ -67,6 +67,18 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets user Session with pages.
+        /// </summary>
+        /// <returns>A list of all Session.</returns>
+        [HttpGet("user/{userId}", Name = "GET - Entrypoint for get user Sessions")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllSessionsWithPages(int userId)
+        {
+            var sessions = _sessionService.GetSessionsFromUser(userId);
+            return Ok(sessions);
+        }
+
+        /// <summary>
         /// Gets a session by its identifier.
         /// </summary>
         /// <param name="sessionId">The session identifier.</param>

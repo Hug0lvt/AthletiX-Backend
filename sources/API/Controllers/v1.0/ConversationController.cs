@@ -62,8 +62,20 @@ namespace API.Controllers.v1_0
             [FromQuery] int pageSize = 10,
             [FromQuery] int pageNumber = 0)
         {
-            var categories = _conversationService.GetAllConversationsWithPages(pageSize, pageNumber);
-            return Ok(categories);
+            var conversations = _conversationService.GetAllConversationsWithPages(pageSize, pageNumber);
+            return Ok(conversations);
+        }
+
+        /// <summary>
+        /// Gets all Conversations with pages.
+        /// </summary>
+        /// <returns>A list of all Conversations.</returns>
+        [HttpGet("user/{userId}", Name = "GET - Entrypoint for get user Conversations")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetConversationsForUser(int userId)
+        {
+            var conversations = _conversationService.GetConversationsForUser(userId);
+            return Ok(conversations);
         }
 
         /// <summary>

@@ -70,6 +70,23 @@ namespace API.Services
         }
 
         /// <summary>
+        /// Gets Session from user id.
+        /// </summary>
+        /// <returns>A list of all Session for one user.</returns>
+        public PaginationResult<Session> GetSessionsFromUser(int id)
+        {
+            var items = _dbContext.Sessions.Where(q => q.Profile.Id == id).ToList();
+            var totalItems = items.Count();
+
+            return new PaginationResult<Session>
+            {
+                Items = items,
+                NextPage = -1,
+                TotalItems = totalItems
+            };
+        }
+
+        /// <summary>
         /// Gets a session by its identifier.
         /// </summary>
         /// <param name="sessionId">The identifier of the session.</param>
