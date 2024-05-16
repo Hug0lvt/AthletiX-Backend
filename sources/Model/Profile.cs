@@ -11,13 +11,15 @@ namespace Model
     public class Profile
     {
         public int Id { get; set; }
-        public string Username { get; set; }
-        public string UniqueNotificationToken { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string UniqueNotificationToken { get; set; } = string.Empty;
         public Role Role { get; set; }
         public int Age { get; set; }
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
         public float Weight { get; set; }
         public float Height { get; set; }
+        public bool Gender { get; set; }
+        public string Picture { get; set; } = string.Empty; // en base64 en base de données
 
     }
 }

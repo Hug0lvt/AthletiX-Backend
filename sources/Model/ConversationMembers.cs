@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace Model
 {
-    public class Message
+    public class ConversationMembers
     {
         public int Id { get; set; }
         public int ConversationId { get; set; }
-        public string Content { get; set; } = string.Empty;
-        public DateTime DateSent { get; set; }
-        public Profile Sender { get; set; }
-
+        public int ProfileId { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Model;
 using API.Exceptions;
 using API.Repositories;
 using Shared.Mappers;
+using System.Linq;
 
 namespace API.Services
 {
@@ -76,15 +77,19 @@ namespace API.Services
         public PaginationResult<Conversation> GetConversationsForUser(int userId)
         {
             
-            var items = _dbContext.Conversations
-                .Where(q => q.Profiles.Any(p => p.Id == userId))
+            var items = _dbContext.ConversationMembers
+                .Where(q => q.ProfileId == userId)
+                .ToList();
+            var conversationIds = items.Select(cm => cm.ConversationId).ToList();
+            var userConversations = _dbContext.Conversations
+                .Where(c => conversationIds.Contains(c.Id))
                 .ToList();
 
             var totalItems = items.Count();
 
             return new PaginationResult<Conversation>
             {
-                Items = items,
+                Items = userConversations,
                 NextPage = -1,
                 TotalItems = totalItems
             };

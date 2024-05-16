@@ -67,6 +67,18 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets all comments.
+        /// </summary>
+        /// <returns>A list of all comments.</returns>
+        [HttpGet("post/{postId}", Name = "GET - Entrypoint for get all Comments from post id")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllCommentsFromPost(int postId)
+        {
+            var comments = _commentService.GetAllCommentsOnPost(postId);
+            return Ok(comments);
+        }
+
+        /// <summary>
         /// Gets a comment by its identifier.
         /// </summary>
         /// <param name="commentId">The comment identifier.</param>

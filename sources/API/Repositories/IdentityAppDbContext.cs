@@ -9,6 +9,7 @@ namespace API.Repositories
         public DbSet<Category> Categories { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<ConversationMembers> ConversationMembers { get; set; }
         public DbSet<Exercise> Exercises { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Post> Posts { get; set; }
@@ -36,6 +37,16 @@ namespace API.Repositories
 
             // Configure Conversation
             modelBuilder.Entity<Conversation>().HasKey(c => c.Id);
+            modelBuilder.Entity<Conversation>().Property(c => c.Name).IsRequired();
+            modelBuilder.Entity<Conversation>().Property(c => c.Picture).IsRequired(false);
+
+            // Configure ConversationMembers
+            modelBuilder.Entity<ConversationMembers>().HasKey(c => c.Id);
+            modelBuilder.Entity<ConversationMembers>().Property(c => c.ConversationId).IsRequired();
+            modelBuilder.Entity<ConversationMembers>().Property(c => c.ProfileId).IsRequired();
+            modelBuilder.Entity<ConversationMembers>()
+                .HasIndex(cm => new { cm.ConversationId, cm.ProfileId })
+                .IsUnique();
 
             // Configure Exercise
             modelBuilder.Entity<Exercise>().HasKey(e => e.Id);
@@ -46,7 +57,6 @@ namespace API.Repositories
             modelBuilder.Entity<Message>().HasKey(m => m.Id);
             modelBuilder.Entity<Message>().Property(m => m.Content).IsRequired();
             modelBuilder.Entity<Message>().Property(m => m.DateSent).IsRequired();
-            modelBuilder.Entity<Message>().HasOne(m => m.Sender).WithMany();
 
             // Configure Post
             modelBuilder.Entity<Post>().HasKey(p => p.Id);
@@ -61,6 +71,7 @@ namespace API.Repositories
             modelBuilder.Entity<Profile>().Property(p => p.Username).IsRequired();
             modelBuilder.Entity<Profile>().Property(p => p.Age).IsRequired();
             modelBuilder.Entity<Profile>().Property(p => p.Email).IsRequired();
+            modelBuilder.Entity<Profile>().Property(p => p.Picture).IsRequired(false);
 
             // Configure Session
             modelBuilder.Entity<Session>().HasKey(s => s.Id);
@@ -75,10 +86,46 @@ namespace API.Repositories
             modelBuilder.Entity<Set>().Property(s => s.Mode).IsRequired();
 
             // Relationships
-            modelBuilder.Entity<Comment>().HasMany(c => c.Answers).WithOne();
-            modelBuilder.Entity<Conversation>().HasMany(c => c.Profiles);
-            modelBuilder.Entity<Conversation>().HasMany(c => c.Messages).WithOne();
-            modelBuilder.Entity<Session>().HasMany(s => s.Exercises).WithOne();
+            modelBuilder.Entity<Set>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne<Exercise>()
+                      .WithMany()
+                      .HasForeignKey(e => e.ExerciseId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Ignore(e => e.Weight);
+                entity.Property(e => e.WeightJson)
+                      .HasColumnName("Weight")
+                      .IsRequired();
+            });
+            modelBuilder.Entity<Exercise>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne<Session>()
+                      .WithMany()
+                      .HasForeignKey(e => e.SessionId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<Session>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.Profile)
+                      .WithMany()
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Message>()
+            .HasOne<Conversation>()
+            .WithMany()
+            .HasForeignKey(m => m.ConversationId)
+            .IsRequired();
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey("SenderId")
+                .IsRequired();
         }
     }
 }

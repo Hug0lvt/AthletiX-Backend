@@ -10,10 +10,9 @@ namespace Model
     {
         public int Id { get; set; }
         public Profile Profile { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public DateTime Date { get; set; }
         public TimeSpan Duration { get; set; }
-        public List<Exercise> Exercises { get; set; } = new List<Exercise>(); //TODO rm
 
     }
 }
