@@ -4,16 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Dommain.Entities
 {
-    public class Session
+    public class SessionEntity
     {
         public int Id { get; set; }
-        public Profile Profile { get; set; }
-        public string Name { get; set; }
+        public ProfileEntity Profile { get; set; }
+        public string Name { get; set; } = string.Empty;
         public DateTime Date { get; set; }
         public TimeSpan Duration { get; set; }
-        public List<Exercise> Exercises { get; set; } = new List<Exercise>();
 
     }
 }

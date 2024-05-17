@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.Mappers
+namespace Shared
 {
     public class PaginationResult<TItem>
         where TItem : class

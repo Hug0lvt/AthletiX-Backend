@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Dommain.Entities
 {
-    public class ConversationMembers
+    public class MessageEntity
     {
         public int Id { get; set; }
         public int ConversationId { get; set; }
-        public int ProfileId { get; set; }
+        public string Content { get; set; } = string.Empty;
+        public DateTime DateSent { get; set; }
+        public ProfileEntity Sender { get; set; }
+
     }
 }

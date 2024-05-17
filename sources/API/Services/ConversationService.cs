@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
-using Shared.Mappers;
+using Shared.Exceptions;
 using System.Linq;
+using Shared;
+using AutoMapper;
+using Dommain.Entities;
 
 namespace API.Services
 {
@@ -15,16 +16,18 @@ namespace API.Services
     {
         private readonly ILogger<ConversationService> _logger;
         private readonly IdentityAppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConversationService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public ConversationService(IdentityAppDbContext dbContext, ILogger<ConversationService> logger)
+        public ConversationService(IdentityAppDbContext dbContext, ILogger<ConversationService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -34,7 +37,7 @@ namespace API.Services
         /// <returns>The created conversation.</returns>
         public Conversation CreateConversation(Conversation conversation)
         {
-            _dbContext.Conversations.Add(conversation);
+            _dbContext.Conversations.Add(_mapper.Map<ConversationEntity>(conversation));
             _dbContext.SaveChanges();
             return conversation;
         }
@@ -45,7 +48,7 @@ namespace API.Services
         /// <returns>A list of all conversations.</returns>
         public List<Conversation> GetAllConversations()
         {
-            return _dbContext.Conversations.ToList();
+            return _mapper.Map<List<Conversation>>(_dbContext.Conversations.ToList());
         }
 
         /// <summary>
@@ -64,7 +67,7 @@ namespace API.Services
 
             return new PaginationResult<Conversation>
             {
-                Items = items,
+                Items = _mapper.Map<List<Conversation>>(items),
                 NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
                 TotalItems = totalItems
             };
@@ -89,7 +92,7 @@ namespace API.Services
 
             return new PaginationResult<Conversation>
             {
-                Items = userConversations,
+                Items = _mapper.Map<List<Conversation>>(userConversations),
                 NextPage = -1,
                 TotalItems = totalItems
             };
@@ -102,7 +105,7 @@ namespace API.Services
         /// <returns>The conversation with the specified identifier.</returns>
         public Conversation GetConversationById(int conversationId)
         {
-            return _dbContext.Conversations.FirstOrDefault(c => c.Id == conversationId);
+            return _mapper.Map<Conversation>(_dbContext.Conversations.FirstOrDefault(c => c.Id == conversationId));
         }
 
         /// <summary>
@@ -118,7 +121,7 @@ namespace API.Services
             {
                 _dbContext.Conversations.Remove(conversationToDelete);
                 _dbContext.SaveChanges();
-                return conversationToDelete;
+                return _mapper.Map<Conversation>(conversationToDelete);
             }
 
             _logger.LogTrace("[LOG | ConversationService] - (DeleteConversation): Conversation not found");

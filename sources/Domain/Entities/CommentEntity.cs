@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Dommain.Entities
 {
-    public class Comment
+    public class CommentEntity
     {
         public int Id { get; set; }
+        public int PostId { get; set; }
         public DateTime PublishDate { get; set; }
-        public Profile Publisher { get; set; }
-        public string Content { get; set; }
-        public List<Comment> Answers { get; set; } = new List<Comment>();
+        public ProfileEntity Publisher { get; set; }
+        public string Content { get; set; } = string.Empty;
     }
 }

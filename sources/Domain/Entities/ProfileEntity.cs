@@ -6,16 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Dommain.Entities
 {
-    public class Profile
+    public class ProfileEntity
     {
         public int Id { get; set; }
-        public string Username { get; set; }
-        public string UniqueNotificationToken { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string UniqueNotificationToken { get; set; } = string.Empty;
         public Role Role { get; set; }
         public int Age { get; set; }
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
         public float Weight { get; set; }
         public float Height { get; set; }
         public bool Gender { get; set; }

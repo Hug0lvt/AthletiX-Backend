@@ -2,12 +2,13 @@ using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
 using API.Services.Notification;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using API.Repositories;
+using API;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using API.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +52,18 @@ builder.Services.AddIdentityCore<AppUser>().AddEntityFrameworkStores<IdentityApp
 
 #region Logging
 builder.Services.AddLogging(builder => builder.AddConsole());
+#endregion
+
+#region Mappers
+builder.Services.AddAutoMapper(typeof(CategoryMapper));
+builder.Services.AddAutoMapper(typeof(CommentMapper));
+builder.Services.AddAutoMapper(typeof(ConversationMapper));
+builder.Services.AddAutoMapper(typeof(ExerciseMapper));
+builder.Services.AddAutoMapper(typeof(MessageMapper));
+builder.Services.AddAutoMapper(typeof(PostMapper));
+builder.Services.AddAutoMapper(typeof(ProfileMapper));
+builder.Services.AddAutoMapper(typeof(SessionMapper));
+builder.Services.AddAutoMapper(typeof(SetMapper));
 #endregion
 
 #region Dependency Injection

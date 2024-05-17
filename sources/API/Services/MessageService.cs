@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
-using Shared.Mappers;
+using Shared.Exceptions;
+using Shared;
+using AutoMapper;
+using Dommain.Entities;
 
 namespace API.Services
 {
@@ -14,16 +15,18 @@ namespace API.Services
     {
         private readonly ILogger<MessageService> _logger;
         private readonly IdentityAppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessageService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public MessageService(IdentityAppDbContext dbContext, ILogger<MessageService> logger)
+        public MessageService(IdentityAppDbContext dbContext, ILogger<MessageService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -33,7 +36,7 @@ namespace API.Services
         /// <returns>The created message.</returns>
         public Message CreateMessage(Message message)
         {
-            _dbContext.Messages.Add(message);
+            _dbContext.Messages.Add(_mapper.Map<MessageEntity>(message));
             _dbContext.SaveChanges();
             return message;
         }
@@ -44,7 +47,7 @@ namespace API.Services
         /// <returns>A list of all messages.</returns>
         public List<Message> GetAllMessages()
         {
-            return _dbContext.Messages.ToList();
+            return _mapper.Map<List<Message>>(_dbContext.Messages.ToList());
         }
 
         /// <summary>
@@ -63,7 +66,7 @@ namespace API.Services
 
             return new PaginationResult<Message>
             {
-                Items = items,
+                Items = _mapper.Map<List<Message>>(items),
                 NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
                 TotalItems = totalItems
             };
@@ -76,7 +79,7 @@ namespace API.Services
         /// <returns>The message with the specified identifier.</returns>
         public Message GetMessageById(int messageId)
         {
-            return _dbContext.Messages.FirstOrDefault(m => m.Id == messageId);
+            return _mapper.Map<Message>(_dbContext.Messages.FirstOrDefault(m => m.Id == messageId));
         }
 
         /// <summary>
@@ -92,7 +95,7 @@ namespace API.Services
             {
                 existingMessage.Content = updatedMessage.Content;
                 _dbContext.SaveChanges();
-                return existingMessage;
+                return _mapper.Map<Message>(existingMessage);
             }
 
             _logger.LogTrace("[LOG | MessageService] - (UpdateMessage): Message not found");
@@ -112,7 +115,7 @@ namespace API.Services
             {
                 _dbContext.Messages.Remove(messageToDelete);
                 _dbContext.SaveChanges();
-                return messageToDelete;
+                return _mapper.Map<Message>(messageToDelete);
             }
 
             _logger.LogTrace("[LOG | MessageService] - (DeleteMessage): Message not found");

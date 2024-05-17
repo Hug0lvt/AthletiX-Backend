@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using Dommain.Entities;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
+using Shared.Exceptions;
 
 namespace API.Services
 {
@@ -13,16 +13,18 @@ namespace API.Services
     {
         private readonly ILogger<ProfileService> _logger;
         private readonly IdentityAppDbContext _dbContext;
+        private readonly AutoMapper.IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public ProfileService(IdentityAppDbContext dbContext, ILogger<ProfileService> logger)
+        public ProfileService(IdentityAppDbContext dbContext, ILogger<ProfileService> logger, AutoMapper.IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -32,7 +34,7 @@ namespace API.Services
         /// <returns>The created profile.</returns>
         public Profile CreateProfile(Profile profile)
         {
-            _dbContext.Profiles.Add(profile);
+            _dbContext.Profiles.Add(_mapper.Map<ProfileEntity>(profile));
             _dbContext.SaveChanges();
             return profile;
         }
@@ -43,7 +45,7 @@ namespace API.Services
         /// <returns>A list of all user profiles.</returns>
         public List<Profile> GetAllProfiles()
         {
-            return _dbContext.Profiles.ToList();
+            return _mapper.Map<List<Profile>>(_dbContext.Profiles.ToList());
         }
 
         /// <summary>
@@ -53,7 +55,7 @@ namespace API.Services
         /// <returns>The profile with the specified identifier.</returns>
         public Profile GetProfileById(int profileId)
         {
-            return _dbContext.Profiles.FirstOrDefault(p => p.Id == profileId);
+            return _mapper.Map<Profile>(_dbContext.Profiles.FirstOrDefault(p => p.Id == profileId));
         }
 
         /// <summary>
@@ -63,7 +65,7 @@ namespace API.Services
         /// <returns>The profile with the specified identifier.</returns>
         public Profile GetProfileByEmail(string profileEmail)
         {
-            return _dbContext.Profiles.FirstOrDefault(p => p.Email == profileEmail);
+            return _mapper.Map<Profile>(_dbContext.Profiles.FirstOrDefault(p => p.Email == profileEmail));
         }
 
         /// <summary>
@@ -84,7 +86,7 @@ namespace API.Services
                 existingProfile.Weight = updatedProfile.Weight;
                 existingProfile.Height = updatedProfile.Height;
                 _dbContext.SaveChanges();
-                return existingProfile;
+                return _mapper.Map<Profile>(existingProfile);
             }
 
             _logger.LogTrace("[LOG | ProfileService] - (UpdateProfile): Profile not found");
@@ -104,7 +106,7 @@ namespace API.Services
             {
                 existingProfile.UniqueNotificationToken = updatedProfile.UniqueNotificationToken;
                 _dbContext.SaveChanges();
-                return existingProfile;
+                return _mapper.Map<Profile>(existingProfile);
             }
 
             _logger.LogTrace("[LOG | ProfileService] - (UpdateUniqueNotificationToken): Profile not found");
@@ -125,7 +127,7 @@ namespace API.Services
             {
                 _dbContext.Profiles.Remove(profileToDelete);
                 _dbContext.SaveChanges();
-                return profileToDelete;
+                return _mapper.Map<Profile>(profileToDelete);
             }
 
             _logger.LogTrace("[LOG | ProfileService] - (DeleteProfile): Profile not found");

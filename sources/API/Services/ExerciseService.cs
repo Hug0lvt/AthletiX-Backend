@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
-using Shared.Mappers;
+using Shared.Exceptions;
+using Shared;
+using AutoMapper;
+using Dommain.Entities;
 
 namespace API.Services
 {
@@ -14,16 +15,18 @@ namespace API.Services
     {
         private readonly ILogger<ExerciseService> _logger;
         private readonly IdentityAppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExerciseService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public ExerciseService(IdentityAppDbContext dbContext, ILogger<ExerciseService> logger)
+        public ExerciseService(IdentityAppDbContext dbContext, ILogger<ExerciseService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -33,7 +36,7 @@ namespace API.Services
         /// <returns>The created exercise.</returns>
         public Exercise CreateExercise(Exercise exercise)
         {
-            _dbContext.Exercises.Add(exercise);
+            _dbContext.Exercises.Add(_mapper.Map<ExerciseEntity>(exercise));
             _dbContext.SaveChanges();
             return exercise;
         }
@@ -44,7 +47,7 @@ namespace API.Services
         /// <returns>A list of all exercises.</returns>
         public List<Exercise> GetAllExercises()
         {
-            return _dbContext.Exercises.ToList();
+            return _mapper.Map<List<Exercise>>(_dbContext.Exercises.ToList());
         }
 
         /// <summary>
@@ -63,7 +66,7 @@ namespace API.Services
 
             return new PaginationResult<Exercise>
             {
-                Items = items,
+                Items = _mapper.Map<List<Exercise>>(items),
                 NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
                 TotalItems = totalItems
             };
@@ -82,7 +85,7 @@ namespace API.Services
 
             return new PaginationResult<Exercise>
             {
-                Items = items,
+                Items = _mapper.Map<List<Exercise>>(items),
                 NextPage = -1,
                 TotalItems = totalItems
             };
@@ -95,7 +98,7 @@ namespace API.Services
         /// <returns>The exercise with the specified identifier.</returns>
         public Exercise GetExerciseById(int exerciseId)
         {
-            return _dbContext.Exercises.FirstOrDefault(e => e.Id == exerciseId);
+            return _mapper.Map<Exercise>(_dbContext.Exercises.FirstOrDefault(e => e.Id == exerciseId));
         }
 
         /// <summary>
@@ -113,7 +116,7 @@ namespace API.Services
                 existingExercise.Description = updatedExercise.Description;
                 existingExercise.Image = updatedExercise.Image;
                 _dbContext.SaveChanges();
-                return existingExercise;
+                return _mapper.Map<Exercise>(existingExercise);
             }
 
             _logger.LogTrace("[LOG | ExerciseService] - (UpdateExercise): Exercise not found");
@@ -133,7 +136,7 @@ namespace API.Services
             {
                 _dbContext.Exercises.Remove(exerciseToDelete);
                 _dbContext.SaveChanges();
-                return exerciseToDelete;
+                return _mapper.Map<Exercise>(exerciseToDelete);
             }
 
             _logger.LogTrace("[LOG | ExerciseService] - (DeleteExercise): Exercise not found");

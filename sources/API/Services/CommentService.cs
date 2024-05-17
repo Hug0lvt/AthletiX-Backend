@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
-using Shared.Mappers;
+using Shared.Exceptions;
+using Shared;
+using AutoMapper;
+using Dommain.Entities;
 
 namespace API.Services
 {
@@ -12,6 +13,7 @@ namespace API.Services
     /// </summary>
     public class CommentService
     {
+        private readonly IMapper _mapper;
         private readonly ILogger<CommentService> _logger;
         private readonly IdentityAppDbContext _dbContext;
 
@@ -20,10 +22,11 @@ namespace API.Services
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public CommentService(IdentityAppDbContext dbContext, ILogger<CommentService> logger)
+        public CommentService(IdentityAppDbContext dbContext, ILogger<CommentService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -33,7 +36,7 @@ namespace API.Services
         /// <returns>The created comment.</returns>
         public Comment CreateComment(Comment comment)
         {
-            _dbContext.Comments.Add(comment);
+            _dbContext.Comments.Add(_mapper.Map<CommentEntity>(comment));
             _dbContext.SaveChanges();
             return comment;
         }
@@ -44,7 +47,7 @@ namespace API.Services
         /// <returns>A list of all comments.</returns>
         public List<Comment> GetAllComments()
         {
-            return _dbContext.Comments.ToList();
+            return _mapper.Map<List<Comment>>(_dbContext.Comments.ToList());
         }
 
         /// <summary>
@@ -63,7 +66,7 @@ namespace API.Services
 
             return new PaginationResult<Comment>
             {
-                Items = items,
+                Items = _mapper.Map<List<Comment>>(items),
                 NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
                 TotalItems = totalItems
             };
@@ -81,7 +84,7 @@ namespace API.Services
 
             return new PaginationResult<Comment>
             {
-                Items = items,
+                Items = _mapper.Map<List<Comment>>(items),
                 NextPage = -1,
                 TotalItems = totalItems
             };
@@ -94,7 +97,7 @@ namespace API.Services
         /// <returns>The comment with the specified identifier.</returns>
         public Comment GetCommentById(int commentId)
         {
-            return _dbContext.Comments.FirstOrDefault(c => c.Id == commentId);
+            return _mapper.Map<Comment>(_dbContext.Comments.FirstOrDefault(c => c.Id == commentId));
         }
 
         /// <summary>
@@ -110,7 +113,7 @@ namespace API.Services
             {
                 existingComment.Content = updatedComment.Content;
                 _dbContext.SaveChanges();
-                return existingComment;
+                return _mapper.Map<Comment>(existingComment);
             }
 
             _logger.LogTrace("[LOG | CommentService] - (UpdateComment): Comment not found");
@@ -130,7 +133,7 @@ namespace API.Services
             {
                 _dbContext.Comments.Remove(commentToDelete);
                 _dbContext.SaveChanges();
-                return commentToDelete;
+                return _mapper.Map<Comment>(commentToDelete);
             }
 
             _logger.LogTrace("[LOG | CommentService] - (DeleteComment): Comment not found");

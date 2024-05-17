@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using API.Services;
 using Model;
-using API.Exceptions;
+using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers.v1_0
@@ -99,7 +99,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
-                var category = _categoryService.UpdateCategory(updatedCategory);
+                var category = _categoryService.UpdateCategory(categoryId, updatedCategory);
                 return Ok(category);
             }
             catch (NotFoundException ex)

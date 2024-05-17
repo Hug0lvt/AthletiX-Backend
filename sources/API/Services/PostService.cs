@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
-using Shared.Mappers;
+using Shared.Exceptions;
+using Shared;
+using AutoMapper;
+using Dommain.Entities;
 
 namespace API.Services
 {
@@ -14,16 +15,18 @@ namespace API.Services
     {
         private readonly ILogger<PostService> _logger;
         private readonly IdentityAppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public PostService(IdentityAppDbContext dbContext, ILogger<PostService> logger)
+        public PostService(IdentityAppDbContext dbContext, ILogger<PostService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -33,7 +36,7 @@ namespace API.Services
         /// <returns>The created post.</returns>
         public Post CreatePost(Post post)
         {
-            _dbContext.Posts.Add(post);
+            _dbContext.Posts.Add(_mapper.Map<PostEntity>(post));
             _dbContext.SaveChanges();
             return post;
         }
@@ -44,7 +47,7 @@ namespace API.Services
         /// <returns>A list of all posts.</returns>
         public List<Post> GetAllPosts()
         {
-            return _dbContext.Posts.ToList();
+            return _mapper.Map<List<Post>>(_dbContext.Posts.ToList());
         }
 
         /// <summary>
@@ -54,7 +57,7 @@ namespace API.Services
         /// <returns>The post with the specified identifier.</returns>
         public Post GetPostById(int postId)
         {
-            return _dbContext.Posts.FirstOrDefault(p => p.Id == postId);
+            return _mapper.Map<Post>(_dbContext.Posts.FirstOrDefault(p => p.Id == postId));
         }
 
         /// <summary>
@@ -71,7 +74,7 @@ namespace API.Services
 
             return new PaginationResult<Post>
             {
-                Items = items,
+                Items = _mapper.Map<List<Post>>(items),
                 NextPage = -1,
                 TotalItems = totalItems
             };
@@ -91,7 +94,7 @@ namespace API.Services
 
             return new PaginationResult<Post>
             {
-                Items = items,
+                Items = _mapper.Map<List<Post>>(items),
                 NextPage = -1,
                 TotalItems = totalItems
             };
@@ -112,7 +115,7 @@ namespace API.Services
                 existingPost.Description = updatedPost.Description;
                 // You may want to include updating the content if necessary
                 _dbContext.SaveChanges();
-                return existingPost;
+                return _mapper.Map<Post>(existingPost);
             }
 
             _logger.LogTrace("[LOG | PostService] - (UpdatePost): Post not found");
@@ -132,7 +135,7 @@ namespace API.Services
             {
                 _dbContext.Posts.Remove(postToDelete);
                 _dbContext.SaveChanges();
-                return postToDelete;
+                return _mapper.Map<Post>(postToDelete);
             }
 
             _logger.LogTrace("[LOG | PostService] - (DeletePost): Post not found");
