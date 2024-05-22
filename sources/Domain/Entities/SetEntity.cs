@@ -1,6 +1,7 @@
 ﻿using Shared.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,13 @@ namespace Dommain.Entities
 {
     public class SetEntity
     {
+        [Key]
         public int Id { get; set; }
+
         public int ExerciseId { get; set; }
+        [ForeignKey(nameof(ExerciseId))]
+        public virtual ExerciseEntity Exercise { get; set; }
+
         public int Reps { get; set; }
         
         [NotMapped]
