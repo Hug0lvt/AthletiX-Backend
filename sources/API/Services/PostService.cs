@@ -5,6 +5,7 @@ using Shared.Exceptions;
 using Shared;
 using AutoMapper;
 using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -36,9 +37,37 @@ namespace API.Services
         /// <returns>The created post.</returns>
         public Post CreatePost(Post post)
         {
-            _dbContext.Posts.Add(_mapper.Map<PostEntity>(post));
+            PostEntity entity = _mapper.Map<PostEntity>(post);
+
+            try
+            {
+                var existingCategory = _dbContext.Categories
+                    .FirstOrDefault(c => c.Id == entity.Category.Id);
+                entity.CategoryId = existingCategory.Id;
+                _dbContext.Entry(existingCategory).State = EntityState.Unchanged;
+                entity.Category = null;
+            } catch (Exception ex)
+            {
+                throw new Exception("Category does not exist.");
+            }
+
+            try
+            {
+                var existingProfile = _dbContext.Profiles
+                    .FirstOrDefault(c => c.Id == entity.Publisher.Id);
+                entity.CategoryId = existingProfile.Id;
+                _dbContext.Entry(existingProfile).State = EntityState.Unchanged;
+                entity.Publisher = null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Publisher does not exist.");
+            }
+
+            _dbContext.Posts.Add(entity);
             _dbContext.SaveChanges();
-            return post;
+
+            return _mapper.Map<Post>(entity);
         }
 
         /// <summary>

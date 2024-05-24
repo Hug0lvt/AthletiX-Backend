@@ -14,6 +14,7 @@ namespace Dommain.Entities
     {
         [Key]
         public int Id { get; set; }
+
         public int ProfileId { get; set; }
         [ForeignKey(nameof(ProfileId))]
         public virtual ProfileEntity Publisher { get; set; }
