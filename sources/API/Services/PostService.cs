@@ -35,40 +35,37 @@ namespace API.Services
         /// </summary>
         /// <param name="post">The post to be created.</param>
         /// <returns>The created post.</returns>
-        public Post CreatePost(Post post)
+        public async Task<Post> CreatePostAsync(Post post)
         {
-            PostEntity entity = _mapper.Map<PostEntity>(post);
-
             try
             {
-                var existingCategory = _dbContext.Categories
-                    .FirstOrDefault(c => c.Id == entity.Category.Id);
+                var existingCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == post.Category.Id);
+                if (existingCategory == null)
+                    throw new NotCreatedExecption("Category does not exist.");
+
+                var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.Id == post.Publisher.Id);
+                if (existingProfile == null)
+                    throw new NotCreatedExecption("Publisher does not exist.");
+
+                var entity = _mapper.Map<PostEntity>(post);
+
                 entity.CategoryId = existingCategory.Id;
-                _dbContext.Entry(existingCategory).State = EntityState.Unchanged;
-                entity.Category = null;
-            } catch (Exception ex)
-            {
-                throw new Exception("Category does not exist.");
-            }
+                entity.ProfileId = existingProfile.Id;
 
-            try
-            {
-                var existingProfile = _dbContext.Profiles
-                    .FirstOrDefault(c => c.Id == entity.Publisher.Id);
-                entity.CategoryId = existingProfile.Id;
+                _dbContext.Entry(existingCategory).State = EntityState.Unchanged;
                 _dbContext.Entry(existingProfile).State = EntityState.Unchanged;
-                entity.Publisher = null;
+
+                _dbContext.Posts.Add(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return _mapper.Map<Post>(entity);
             }
             catch (Exception ex)
             {
-                throw new Exception("Publisher does not exist.");
+                throw new Exception("Failed to create post.", ex);
             }
-
-            _dbContext.Posts.Add(entity);
-            _dbContext.SaveChanges();
-
-            return _mapper.Map<Post>(entity);
         }
+
 
         /// <summary>
         /// Gets all posts.
@@ -104,7 +101,6 @@ namespace API.Services
             return new PaginationResult<Post>
             {
                 Items = _mapper.Map<List<Post>>(items),
-                NextPage = -1,
                 TotalItems = totalItems
             };
         }
@@ -124,7 +120,6 @@ namespace API.Services
             return new PaginationResult<Post>
             {
                 Items = _mapper.Map<List<Post>>(items),
-                NextPage = -1,
                 TotalItems = totalItems
             };
         }
@@ -134,22 +129,31 @@ namespace API.Services
         /// </summary>
         /// <param name="updatedPost">The updated post.</param>
         /// <returns>The updated post.</returns>
-        public Post UpdatePost(Post updatedPost)
+        public Post UpdatePost(int postId, Post updatedPost)
         {
-            var existingPost = _dbContext.Posts.Find(updatedPost.Id);
+            if (postId != updatedPost.Id)
+                updatedPost.Id = postId;
+
+            var existingPost = _dbContext.Posts.Include(p => p.Category).Include(p => p.Publisher).FirstOrDefault(p => p.Id == updatedPost.Id);
 
             if (existingPost != null)
             {
                 existingPost.Title = updatedPost.Title;
+                existingPost.Content = updatedPost.Content;
                 existingPost.Description = updatedPost.Description;
-                // You may want to include updating the content if necessary
+                existingPost.CategoryId = updatedPost.Category.Id;
+                existingPost.ProfileId = updatedPost.Publisher.Id;
+                existingPost.PublicationType = updatedPost.PublicationType;
+
                 _dbContext.SaveChanges();
+
                 return _mapper.Map<Post>(existingPost);
             }
 
             _logger.LogTrace("[LOG | PostService] - (UpdatePost): Post not found");
             throw new NotFoundException("[LOG | PostService] - (UpdatePost): Post not found");
         }
+
 
         /// <summary>
         /// Deletes a post by its identifier.

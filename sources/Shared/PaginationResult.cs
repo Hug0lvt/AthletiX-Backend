@@ -22,6 +22,6 @@ namespace Shared
         /// <summary>
         /// The query next page Url.
         /// </summary>
-        public int NextPage { get; set; } = 0;
+        public int? NextPage { get; set; } = null;
     }
 }

@@ -34,9 +34,9 @@ namespace API.Controllers.v1_0
         /// <returns>The newly created post.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Post")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreatePost([FromBody] Post post)
+        public async Task<IActionResult> CreatePost([FromBody] Post post)
         {
-            var createdPost = _postService.CreatePost(post);
+            var createdPost = await _postService.CreatePostAsync(post);
             return CreatedAtAction(nameof(GetPostById), new { postId = createdPost.Id }, createdPost);
         }
 
@@ -113,7 +113,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
-                var post = _postService.UpdatePost(updatedPost);
+                var post = _postService.UpdatePost(postId, updatedPost);
                 return Ok(post);
             }
             catch (NotFoundException ex)
