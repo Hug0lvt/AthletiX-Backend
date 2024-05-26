@@ -60,9 +60,10 @@ namespace API.Controllers.v1_0
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllCommentsWithPages(
             [FromQuery] int pageSize = 10,
-            [FromQuery] int pageNumber = 0)
+            [FromQuery] int pageNumber = 0,
+            bool includeAnswers = false)
         {
-            var comments = _commentService.GetAllCommentsWithPages(pageSize, pageNumber);
+            var comments = _commentService.GetAllCommentsWithPages(pageSize, pageNumber, includeAnswers);
             return Ok(comments);
         }
 
@@ -72,9 +73,9 @@ namespace API.Controllers.v1_0
         /// <returns>A list of all comments.</returns>
         [HttpGet("post/{postId}", Name = "GET - Entrypoint for get all Comments from post id")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetAllCommentsFromPost(int postId)
+        public IActionResult GetAllCommentsFromPost(int postId, bool includeAnswers = false)
         {
-            var comments = _commentService.GetAllCommentsOnPost(postId);
+            var comments = _commentService.GetAllCommentsOnPost(postId, includeAnswers);
             return Ok(comments);
         }
 

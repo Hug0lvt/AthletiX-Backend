@@ -6,6 +6,8 @@ using Shared;
 using AutoMapper;
 using Dommain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using System.ComponentModel.Design;
 
 namespace API.Services
 {
@@ -83,19 +85,33 @@ namespace API.Services
         /// <returns>A list of all comments.</returns>
         public PaginationResult<Comment> GetAllCommentsWithPages(
             int pageSize = 10,
-            int pageNumber = 0)
+            int pageNumber = 0, 
+            bool includeAnswers = false)
         {
             var totalItems = _dbContext.Comments.Count();
-            var items = _dbContext.Comments
+            var items = _mapper.Map<List<Comment>>(_dbContext.Comments
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
-                .ToList();
+                .ToList());
 
-            // TODO Add Answers
+            if (includeAnswers)
+            {
+                foreach (var comment in items)
+                {
+                    if (comment != null)
+                    {
+                        List<Comment> answers = _mapper.Map<List<Comment>>(_dbContext.Comments
+                        .Include(c => c.Publisher)
+                        .Where(c => c.ParentCommentId == comment.Id)
+                        .ToList());
+                        comment.Answers = answers;
+                    }
+                }
+            }
 
             return new PaginationResult<Comment>
             {
-                Items = _mapper.Map<List<Comment>>(items),
+                Items = items,
                 NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
                 TotalItems = totalItems
             };
@@ -105,17 +121,31 @@ namespace API.Services
         /// Gets all comments for a post.
         /// </summary>
         /// <returns>A list of all comments for one post.</returns>
-        public PaginationResult<Comment> GetAllCommentsOnPost(int postId)
+        public PaginationResult<Comment> GetAllCommentsOnPost(int postId, bool includeAnswers = false)
         {
-            var items = _dbContext.Comments.Where(q => q.PostId == postId)
-                .ToList();
-            // TODO Add Answers
+            var items = _mapper.Map<List<Comment>>(_dbContext.Comments.Where(q => q.PostId == postId)
+                .ToList());
+
+            if (includeAnswers)
+            {
+                foreach (var comment in items)
+                {
+                    if (comment != null)
+                    {
+                        List<Comment> answers = _mapper.Map<List<Comment>>(_dbContext.Comments
+                        .Include(c => c.Publisher)
+                        .Where(c => c.ParentCommentId == comment.Id)
+                        .ToList());
+                        comment.Answers = answers;
+                    }
+                }
+            }
 
             var totalItems = items.Count();
 
             return new PaginationResult<Comment>
             {
-                Items = _mapper.Map<List<Comment>>(items),
+                Items = items,
                 NextPage = -1,
                 TotalItems = totalItems
             };
@@ -128,8 +158,21 @@ namespace API.Services
         /// <returns>The comment with the specified identifier.</returns>
         public Comment GetCommentById(int commentId)
         {
-            return _mapper.Map<Comment>(_dbContext.Comments.FirstOrDefault(c => c.Id == commentId));
-            // TODO Add Answers
+            Comment comment = _mapper.Map<Comment>(_dbContext.Comments
+                .Include(c => c.Post)
+                .Include(c => c.Publisher)
+                .FirstOrDefault(c => c.Id == commentId));
+
+            if (comment != null)
+            {
+                List<Comment> answers = _mapper.Map<List<Comment>>(_dbContext.Comments
+                .Include(c => c.Publisher)
+                .Where(c => c.ParentCommentId == commentId)
+                .ToList());
+                comment.Answers = answers;
+            }
+
+            return comment;
         }
 
         /// <summary>
