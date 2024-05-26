@@ -435,6 +435,12 @@ namespace API.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Categories_Title",
+                table: "Categories",
+                column: "Title",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Comments_ParentCommentId",
                 table: "Comments",
                 column: "ParentCommentId");
@@ -488,6 +494,12 @@ namespace API.Migrations
                 name: "IX_Posts_ProfileId",
                 table: "Posts",
                 column: "ProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Profiles_Email",
+                table: "Profiles",
+                column: "Email",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_ProfileId",

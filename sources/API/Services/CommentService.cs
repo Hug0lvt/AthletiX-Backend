@@ -5,6 +5,7 @@ using Shared.Exceptions;
 using Shared;
 using AutoMapper;
 using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -34,11 +35,37 @@ namespace API.Services
         /// </summary>
         /// <param name="comment">The comment to be created.</param>
         /// <returns>The created comment.</returns>
-        public Comment CreateComment(Comment comment)
+        public async Task<Comment> CreateCommentAsync(Comment comment)
         {
-            _dbContext.Comments.Add(_mapper.Map<CommentEntity>(comment));
-            _dbContext.SaveChanges();
-            return comment;
+            try
+            {
+                var existingPost = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == comment.Post.Id);
+                if (existingPost == null)
+                    throw new NotCreatedExecption("Post does not exist.");
+
+                var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.Id == comment.Publisher.Id);
+                if (existingProfile == null)
+                    throw new NotCreatedExecption("Publisher does not exist.");
+
+                var entity = _mapper.Map<CommentEntity>(comment);
+
+                entity.PostId = existingPost.Id;
+                entity.ProfileId = existingProfile.Id;
+                entity.Publisher = null;
+                entity.Post = null;
+
+                _dbContext.Entry(existingPost).State = EntityState.Unchanged;
+                _dbContext.Entry(existingProfile).State = EntityState.Unchanged;
+
+                _dbContext.Comments.Add(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return _mapper.Map<Comment>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to create comment.", ex);
+            }
         }
 
         /// <summary>
@@ -64,6 +91,8 @@ namespace API.Services
                 .Take(pageSize)
                 .ToList();
 
+            // TODO Add Answers
+
             return new PaginationResult<Comment>
             {
                 Items = _mapper.Map<List<Comment>>(items),
@@ -80,6 +109,8 @@ namespace API.Services
         {
             var items = _dbContext.Comments.Where(q => q.PostId == postId)
                 .ToList();
+            // TODO Add Answers
+
             var totalItems = items.Count();
 
             return new PaginationResult<Comment>
@@ -98,6 +129,7 @@ namespace API.Services
         public Comment GetCommentById(int commentId)
         {
             return _mapper.Map<Comment>(_dbContext.Comments.FirstOrDefault(c => c.Id == commentId));
+            // TODO Add Answers
         }
 
         /// <summary>

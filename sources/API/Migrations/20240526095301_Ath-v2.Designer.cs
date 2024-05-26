@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(IdentityAppDbContext))]
-    [Migration("20240524155103_Ath-v2")]
+    [Migration("20240526095301_Ath-v2")]
     partial class Athv2
     {
         /// <inheritdoc />
@@ -103,6 +103,9 @@ namespace API.Migrations
                         .HasColumnType("character varying(30)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Title")
+                        .IsUnique();
 
                     b.ToTable("Categories");
                 });
@@ -333,6 +336,9 @@ namespace API.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Profiles");
                 });

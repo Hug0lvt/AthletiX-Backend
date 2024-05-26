@@ -12,19 +12,16 @@ namespace Dommain.Entities
     {
         [Key]
         public int Id { get; set; }
-
         [Required]
         public DateTime PublishDate { get; set; }
 
         [Required]
         public int ProfileId { get; set; }
-
         [ForeignKey(nameof(ProfileId))]
         public virtual ProfileEntity Publisher { get; set; }
 
         [Required]
         public int PostId { get; set; }
-
         [ForeignKey(nameof(PostId))]
         public virtual PostEntity Post { get; set; }
 
@@ -33,7 +30,6 @@ namespace Dommain.Entities
         public string Content { get; set; }
 
         public int? ParentCommentId { get; set; }
-
         [ForeignKey(nameof(ParentCommentId))]
         public virtual CommentEntity ParentComment { get; set; }
     }

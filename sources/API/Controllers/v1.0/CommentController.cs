@@ -34,9 +34,9 @@ namespace API.Controllers.v1_0
         /// <returns>The newly created comment.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Comment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreateComment([FromBody] Comment comment)
+        public async Task<IActionResult> CreateComment([FromBody] Comment comment)
         {
-            var createdComment = _commentService.CreateComment(comment);
+            var createdComment = await _commentService.CreateCommentAsync(comment);
             return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.Id }, createdComment);
         }
 

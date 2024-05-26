@@ -101,6 +101,9 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Title")
+                        .IsUnique();
+
                     b.ToTable("Categories");
                 });
 
@@ -330,6 +333,9 @@ namespace API.Migrations
                         .HasColumnType("real");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Profiles");
                 });

@@ -26,7 +26,8 @@ namespace API
         {
             base.OnModelCreating(modelBuilder);
 
-
+            modelBuilder.Entity<CategoryEntity>().HasIndex(u => u.Title).IsUnique();
+            modelBuilder.Entity<ProfileEntity>().HasIndex(u => u.Email).IsUnique();
             // TODO A COMPLETER
         }
     }

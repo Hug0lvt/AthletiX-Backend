@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Model;
 using Shared.Exceptions;
@@ -34,9 +35,16 @@ namespace API.Services
         /// <returns>The created profile.</returns>
         public Profile CreateProfile(Profile profile)
         {
-            _dbContext.Profiles.Add(_mapper.Map<ProfileEntity>(profile));
-            _dbContext.SaveChanges();
-            return profile;
+            try
+            {
+                _dbContext.Profiles.Add(_mapper.Map<ProfileEntity>(profile));
+                _dbContext.SaveChanges();
+                return profile;
+            } catch (DbUpdateException e)
+            {
+                _logger.LogTrace("[LOG | ProfileService] - (CreateProfile): Profile exist");
+                return _mapper.Map<Profile>(_dbContext.Profiles.FirstOrDefault(p => p.Email == profile.Email));   
+            }
         }
 
         /// <summary>

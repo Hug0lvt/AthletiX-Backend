@@ -5,6 +5,8 @@ using Shared.Exceptions;
 using Shared;
 using AutoMapper;
 using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Services
 {
@@ -36,9 +38,17 @@ namespace API.Services
         /// <returns>The created category.</returns>
         public Category CreateCategory(Category category)
         {
-            _dbContext.Categories.Add(_mapper.Map<CategoryEntity>(category));
-            _dbContext.SaveChanges();
-            return category;
+            try
+            {
+                _dbContext.Categories.Add(_mapper.Map<CategoryEntity>(category));
+                _dbContext.SaveChanges();
+                return category;
+            }
+            catch (DbUpdateException e)
+            {
+                _logger.LogTrace("[LOG | CategoryService] - (CreateCategory): Category exist");
+                return _mapper.Map<Category>(_dbContext.Categories.FirstOrDefault(p => p.Title == category.Title));
+            }
         }
 
         /// <summary>

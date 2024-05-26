@@ -40,6 +40,8 @@ namespace API.Controllers.v1_0
             return CreatedAtAction(nameof(GetCategoryById), new { categoryId = createdCategory.Id }, createdCategory);
         }
 
+
+
         /// <summary>
         /// Gets all categories.
         /// </summary>

@@ -6,6 +6,7 @@ using Shared;
 using AutoMapper;
 using Dommain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace API.Services
 {
@@ -85,10 +86,19 @@ namespace API.Services
         /// <returns>The post with the specified identifier.</returns>
         public Post GetPostById(int postId)
         {
-            return _mapper.Map<Post>(_dbContext.Posts
+            Post post = _mapper.Map<Post>(_dbContext.Posts
                 .Include(p => p.Category)
                 .Include(p => p.Publisher)
                 .FirstOrDefault(p => p.Id == postId));
+
+            if(post != null)
+            {
+                List<Comment> comments = _mapper.Map<List<Comment>>(_dbContext.Comments
+                .Where(c => c.PostId == post.Id).ToList());
+                post.Comments = comments;
+            }
+
+            return post;
         }
 
         /// <summary>
@@ -96,16 +106,30 @@ namespace API.Services
         /// </summary>
         /// <param name="categoryId">The identifier of the category.</param>
         /// <returns>The paginated list of posts with the specified category id.</returns>
-        public PaginationResult<Post> GetPostsByCategory(int categoryId)
+        public PaginationResult<Post> GetPostsByCategory(int categoryId, bool includeComments = false)
         {
-            var items = _dbContext.Posts.Include(p => p.Category).Include(p => p.Publisher)
+            var items = _mapper.Map<List<Post>>(_dbContext.Posts.Include(p => p.Category).Include(p => p.Publisher)
                 .Where(p => p.Category.Id == categoryId)
-                .ToList();
+                .ToList());
+
+            if (includeComments)
+            {
+                foreach (var post in items)
+                {
+                    if (post != null)
+                    {
+                        List<Comment> comments = _mapper.Map<List<Comment>>(_dbContext.Comments
+                        .Where(c => c.PostId == post.Id).ToList());
+                        post.Comments = comments;
+                    }
+                }
+            }
+
             var totalItems = items.Count();
 
             return new PaginationResult<Post>
             {
-                Items = _mapper.Map<List<Post>>(items),
+                Items = items,
                 TotalItems = totalItems
             };
         }
@@ -115,16 +139,30 @@ namespace API.Services
         /// </summary>
         /// <param name="categoryId">The identifier of the user.</param>
         /// <returns>The list of posts with the specified user id.</returns>
-        public PaginationResult<Post> GetPostsByUser(int userId)
+        public PaginationResult<Post> GetPostsByUser(int userId, bool includeComments = false)
         {
-            var items = _dbContext.Posts.Include(p => p.Category).Include(p => p.Publisher)
+            var items = _mapper.Map<List<Post>>(_dbContext.Posts.Include(p => p.Category).Include(p => p.Publisher)
                 .Where(p => p.Publisher.Id == userId)
-                .ToList();
+                .ToList());
+
+            if (includeComments)
+            {
+                foreach (var post in items)
+                {
+                    if (post != null)
+                    {
+                        List<Comment> comments = _mapper.Map<List<Comment>>(_dbContext.Comments
+                        .Where(c => c.PostId == post.Id).ToList());
+                        post.Comments = comments;
+                    }
+                }
+            }
+
             var totalItems = items.Count();
 
             return new PaginationResult<Post>
             {
-                Items = _mapper.Map<List<Post>>(items),
+                Items = items,
                 TotalItems = totalItems
             };
         }

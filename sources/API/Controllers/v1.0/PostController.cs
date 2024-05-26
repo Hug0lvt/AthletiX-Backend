@@ -68,9 +68,9 @@ namespace API.Controllers.v1_0
         [HttpGet("category/{categoryId}", Name = "GET - Entrypoint for retrieving posts by category")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetPostByCategory(int categoryId)
+        public IActionResult GetPostByCategory(int categoryId, bool includeComments = false)
         {
-            var post = _postService.GetPostsByCategory(categoryId);
+            var post = _postService.GetPostsByCategory(categoryId, includeComments);
 
             if (post == null)
             {
@@ -88,9 +88,9 @@ namespace API.Controllers.v1_0
         [HttpGet("user/{userId}", Name = "GET - Entrypoint for retrieving posts by user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetPostByUser(int userId)
+        public IActionResult GetPostByUser(int userId, bool includeComments = false)
         {
-            var post = _postService.GetPostsByUser(userId);
+            var post = _postService.GetPostsByUser(userId, includeComments);
 
             if (post == null)
             {
