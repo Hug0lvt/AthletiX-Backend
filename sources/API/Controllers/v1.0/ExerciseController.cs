@@ -48,9 +48,10 @@ namespace API.Controllers.v1_0
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllExerciseWithPages(
             [FromQuery] int pageSize = 10,
-            [FromQuery] int pageNumber = 0)
+            [FromQuery] int pageNumber = 0,
+            bool includeSet = false)
         {
-            var exercise = _exerciseService.GetAllExercisesWithPages(pageSize, pageNumber);
+            var exercise = _exerciseService.GetAllExercisesWithPages(pageSize, pageNumber, includeSet);
             return Ok(exercise);
         }
 
@@ -60,9 +61,9 @@ namespace API.Controllers.v1_0
         /// <returns>A list of all Exercise.</returns>
         [HttpGet("category/{categoryId}", Name = "GET - Entrypoint for get all Exercise from one category")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetAllExerciseWithPages(int categoryId)
+        public IActionResult GetAllExerciseWithPages(int categoryId, bool includeSet = false)
         {
-            var exercise = _exerciseService.GetExercisesFromCategory(categoryId);
+            var exercise = _exerciseService.GetExercisesFromCategory(categoryId, includeSet);
             return Ok(exercise);
         }
 
@@ -99,6 +100,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if (updatedExercise.Id != exerciseId) updatedExercise.Id = exerciseId;
                 var exercise = _exerciseService.UpdateExercise(updatedExercise);
                 return Ok(exercise);
             }

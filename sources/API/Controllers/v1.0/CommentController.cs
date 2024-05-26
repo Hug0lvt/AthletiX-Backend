@@ -112,6 +112,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if(updatedComment.Id != commentId) updatedComment.Id = commentId;
                 var comment = _commentService.UpdateComment(updatedComment);
                 return Ok(comment);
             }

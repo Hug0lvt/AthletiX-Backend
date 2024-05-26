@@ -93,6 +93,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if(updatedProfile.Id != profileId) updatedProfile.Id = profileId;
                 var profile = _profileService.UpdateProfile(updatedProfile);
                 return Ok(profile);
             }

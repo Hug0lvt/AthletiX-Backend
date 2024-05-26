@@ -34,9 +34,9 @@ namespace API.Controllers.v1_0
         /// <returns>The newly created set.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Set")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreateSet([FromBody] Set set)
+        public async Task<IActionResult> CreateSet([FromBody] Set set)
         {
-            var createdSet = _setService.CreateSet(set);
+            var createdSet = await _setService.CreateSetAsync(set);
             return CreatedAtAction(nameof(GetSetById), new { setId = createdSet.Id }, createdSet);
         }
 
@@ -99,6 +99,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if(updatedSet.Id != setId) updatedSet.Id = setId;
                 var set = _setService.UpdateSet(updatedSet);
                 return Ok(set);
             }

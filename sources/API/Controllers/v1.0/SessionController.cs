@@ -60,9 +60,10 @@ namespace API.Controllers.v1_0
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetAllSessionsWithPages(
             [FromQuery] int pageSize = 10,
-            [FromQuery] int pageNumber = 0)
+            [FromQuery] int pageNumber = 0,
+            bool includeExercise = false)
         {
-            var categories = _sessionService.GetAllSessionsWithPages(pageSize, pageNumber);
+            var categories = _sessionService.GetAllSessionsWithPages(pageSize, pageNumber, includeExercise);
             return Ok(categories);
         }
 
@@ -72,9 +73,9 @@ namespace API.Controllers.v1_0
         /// <returns>A list of all Session.</returns>
         [HttpGet("user/{userId}", Name = "GET - Entrypoint for get user Sessions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult GetAllSessionsWithPages(int userId)
+        public IActionResult GetAllSessionsWithPages(int userId, bool includeExercise = false)
         {
-            var sessions = _sessionService.GetSessionsFromUser(userId);
+            var sessions = _sessionService.GetSessionsFromUser(userId, includeExercise);
             return Ok(sessions);
         }
 
@@ -111,6 +112,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if(updatedSession.Id != sessionId) updatedSession.Id = sessionId;
                 var session = _sessionService.UpdateSession(updatedSession);
                 return Ok(session);
             }

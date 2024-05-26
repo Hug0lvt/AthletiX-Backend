@@ -83,19 +83,33 @@ namespace API.Services
         /// <returns>A list of all Exercise.</returns>
         public PaginationResult<Exercise> GetAllExercisesWithPages(
             int pageSize = 10,
-            int pageNumber = 0)
+            int pageNumber = 0,
+            bool includeSet = false)
         {
             var totalItems = _dbContext.Exercises.Count();
-            var items = _dbContext.Exercises
+            var items = _mapper.Map<List<Exercise>>(_dbContext.Exercises
                 .Include(e => e.Category)
                 .Include(e => e.Session)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
-                .ToList();
+                .ToList());
+
+            if (includeSet)
+            {
+                foreach (var exercise in items)
+                {
+                    if (exercise != null)
+                    {
+                        List<Set> sets = _mapper.Map<List<Set>>(_dbContext.Sets
+                        .Where(s => s.ExerciseId == exercise.Id).ToList());
+                        exercise.Sets = sets;
+                    }
+                }
+            }
 
             return new PaginationResult<Exercise>
             {
-                Items = _mapper.Map<List<Exercise>>(items),
+                Items = items,
                 NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
                 TotalItems = totalItems
             };
@@ -105,18 +119,31 @@ namespace API.Services
         /// Gets all Exercise from category (with pages).
         /// </summary>
         /// <returns>A list of all Exercise in category.</returns>
-        public PaginationResult<Exercise> GetExercisesFromCategory(int categoryId)
+        public PaginationResult<Exercise> GetExercisesFromCategory(int categoryId, bool includeSet = false)
         {
-            var items = _dbContext.Exercises
+            var items = _mapper.Map<List<Exercise>>(_dbContext.Exercises
                 .Include(e => e.Category)
                 .Include(e => e.Session)
                 .Where(q => q.Category.Id == categoryId)
-                .ToList();
+                .ToList());
             var totalItems = items.Count();
+
+            if (includeSet)
+            {
+                foreach (var exercise in items)
+                {
+                    if (exercise != null)
+                    {
+                        List<Set> sets = _mapper.Map<List<Set>>(_dbContext.Sets
+                        .Where(s => s.ExerciseId == exercise.Id).ToList());
+                        exercise.Sets = sets;
+                    }
+                }
+            }
 
             return new PaginationResult<Exercise>
             {
-                Items = _mapper.Map<List<Exercise>>(items),
+                Items = items,
                 NextPage = -1,
                 TotalItems = totalItems
             };
@@ -129,10 +156,17 @@ namespace API.Services
         /// <returns>The exercise with the specified identifier.</returns>
         public Exercise GetExerciseById(int exerciseId)
         {
-            return _mapper.Map<Exercise>(_dbContext.Exercises
+            Exercise exercise = _mapper.Map<Exercise>(_dbContext.Exercises
                 .Include(e => e.Category)
                 .Include(e => e.Session)
                 .FirstOrDefault(e => e.Id == exerciseId));
+            if (exercise != null)
+            {
+                List<Set> sets = _mapper.Map<List<Set>>(_dbContext.Sets
+                .Where(s => s.ExerciseId == exercise.Id).ToList());
+                exercise.Sets = sets;
+            }
+            return exercise;
         }
 
         /// <summary>

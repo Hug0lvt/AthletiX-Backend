@@ -75,18 +75,32 @@ namespace API.Services
         /// <returns>A list of all Session.</returns>
         public PaginationResult<Session> GetAllSessionsWithPages(
             int pageSize = 10,
-            int pageNumber = 0)
+            int pageNumber = 0,
+            bool includeExercise = false)
         {
             var totalItems = _dbContext.Sessions.Count();
-            var items = _dbContext.Sessions
+            var items = _mapper.Map<List<Session>>(_dbContext.Sessions
                 .Include(s => s.Profile)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
-                .ToList();
+                .ToList());
+
+            if (includeExercise)
+            {
+                foreach (var session in items)
+                {
+                    if (session != null)
+                    {
+                        List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.Exercises
+                        .Where(e => e.SessionId == session.Id).ToList());
+                        session.Exercises = exercises;
+                    }
+                }
+            }
 
             return new PaginationResult<Session>
             {
-                Items = _mapper.Map<List<Session>>(items),
+                Items = items,
                 NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
                 TotalItems = totalItems
             };
@@ -96,14 +110,29 @@ namespace API.Services
         /// Gets Session from user id.
         /// </summary>
         /// <returns>A list of all Session for one user.</returns>
-        public PaginationResult<Session> GetSessionsFromUser(int id)
+        public PaginationResult<Session> GetSessionsFromUser(int id, bool includeExercise = false)
         {
-            var items = _dbContext.Sessions.Include(s => s.Profile).Where(q => q.Profile.Id == id).ToList();
+            var items = _mapper.Map<List<Session>>(_dbContext.Sessions
+                .Include(s => s.Profile)
+                .Where(q => q.Profile.Id == id).ToList());
             var totalItems = items.Count();
+
+            if (includeExercise)
+            {
+                foreach (var session in items)
+                {
+                    if (session != null)
+                    {
+                        List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.Exercises
+                        .Where(e => e.SessionId == session.Id).ToList());
+                        session.Exercises = exercises;
+                    }
+                }
+            }
 
             return new PaginationResult<Session>
             {
-                Items = _mapper.Map<List<Session>>(items),
+                Items = items,
                 NextPage = -1,
                 TotalItems = totalItems
             };
@@ -116,7 +145,14 @@ namespace API.Services
         /// <returns>The session with the specified identifier.</returns>
         public Session GetSessionById(int sessionId)
         {
-            return _mapper.Map<Session>(_dbContext.Sessions.Include(s => s.Profile).FirstOrDefault(s => s.Id == sessionId));
+            Session session = _mapper.Map<Session>(_dbContext.Sessions.Include(s => s.Profile).FirstOrDefault(s => s.Id == sessionId));
+            if (session != null)
+            {
+                List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.Exercises
+                .Where(e => e.SessionId == session.Id).ToList());
+                session.Exercises = exercises;
+            }
+            return session;
         }
 
         /// <summary>

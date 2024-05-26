@@ -99,6 +99,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if(updatedMessage.Id != messageId) updatedMessage.Id = messageId;
                 var message = _messageService.UpdateMessage(updatedMessage);
                 return Ok(message);
             }
