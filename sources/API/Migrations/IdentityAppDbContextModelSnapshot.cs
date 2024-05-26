@@ -583,7 +583,7 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dommain.Entities.SessionEntity", "SessionEntity")
+                    b.HasOne("Dommain.Entities.SessionEntity", "Session")
                         .WithMany()
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -591,7 +591,7 @@ namespace API.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("SessionEntity");
+                    b.Navigation("Session");
                 });
 
             modelBuilder.Entity("Dommain.Entities.MessageEntity", b =>

@@ -34,9 +34,9 @@ namespace API.Controllers.v1_0
         /// <returns>The newly created session.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Session")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreateSession([FromBody] Session session)
+        public async Task<IActionResult> CreateSession([FromBody] Session session)
         {
-            var createdSession = _sessionService.CreateSession(session);
+            var createdSession = await _sessionService.CreateSessionAsync(session);
             return CreatedAtAction(nameof(GetSessionById), new { sessionId = createdSession.Id }, createdSession);
         }
 

@@ -13,6 +13,7 @@ namespace Model
         public string Description { get; set; }
         public string Image { get; set; }
         public Category Category { get; set; }
+        public Session Session { get; set; }
         public List<Set> Sets { get; set; } = new List<Set>();
     }
 }

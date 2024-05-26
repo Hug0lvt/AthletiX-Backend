@@ -34,9 +34,9 @@ namespace API.Controllers.v1_0
         /// <returns>The newly created exercise.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Exercise")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreateExercise([FromBody] Exercise exercise)
+        public async Task<IActionResult> CreateExercise([FromBody] Exercise exercise)
         {
-            var createdExercise = _exerciseService.CreateExercise(exercise);
+            var createdExercise = await _exerciseService.CreateExerciseAsync(exercise);
             return CreatedAtAction(nameof(GetExerciseById), new { exerciseId = createdExercise.Id }, createdExercise);
         }
 

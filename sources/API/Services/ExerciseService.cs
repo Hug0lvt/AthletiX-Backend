@@ -5,6 +5,7 @@ using Shared.Exceptions;
 using Shared;
 using AutoMapper;
 using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -34,11 +35,37 @@ namespace API.Services
         /// </summary>
         /// <param name="exercise">The exercise to be created.</param>
         /// <returns>The created exercise.</returns>
-        public Exercise CreateExercise(Exercise exercise)
+        public async Task<Exercise> CreateExerciseAsync(Exercise exercise)
         {
-            _dbContext.Exercises.Add(_mapper.Map<ExerciseEntity>(exercise));
-            _dbContext.SaveChanges();
-            return exercise;
+            try
+            {
+                var existingCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == exercise.Category.Id);
+                if (existingCategory == null)
+                    throw new NotCreatedExecption("Category does not exist.");
+
+                var existingSession = await _dbContext.Sessions.FirstOrDefaultAsync(s => s.Id == exercise.Session.Id);
+                if (existingSession == null)
+                    throw new NotCreatedExecption("Session does not exist.");
+
+                var entity = _mapper.Map<ExerciseEntity>(exercise);
+
+                entity.CategoryId = existingCategory.Id;
+                entity.SessionId = existingSession.Id;
+                entity.Session = null;
+                entity.Category = null;
+
+                _dbContext.Entry(existingCategory).State = EntityState.Unchanged;
+                _dbContext.Entry(existingSession).State = EntityState.Unchanged;
+
+                _dbContext.Exercises.Add(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return _mapper.Map<Exercise>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to create exercise.", ex);
+            }
         }
 
         /// <summary>
@@ -60,6 +87,8 @@ namespace API.Services
         {
             var totalItems = _dbContext.Exercises.Count();
             var items = _dbContext.Exercises
+                .Include(e => e.Category)
+                .Include(e => e.Session)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -79,6 +108,8 @@ namespace API.Services
         public PaginationResult<Exercise> GetExercisesFromCategory(int categoryId)
         {
             var items = _dbContext.Exercises
+                .Include(e => e.Category)
+                .Include(e => e.Session)
                 .Where(q => q.Category.Id == categoryId)
                 .ToList();
             var totalItems = items.Count();
@@ -98,7 +129,10 @@ namespace API.Services
         /// <returns>The exercise with the specified identifier.</returns>
         public Exercise GetExerciseById(int exerciseId)
         {
-            return _mapper.Map<Exercise>(_dbContext.Exercises.FirstOrDefault(e => e.Id == exerciseId));
+            return _mapper.Map<Exercise>(_dbContext.Exercises
+                .Include(e => e.Category)
+                .Include(e => e.Session)
+                .FirstOrDefault(e => e.Id == exerciseId));
         }
 
         /// <summary>

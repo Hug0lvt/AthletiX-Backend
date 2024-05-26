@@ -5,6 +5,7 @@ using Shared.Exceptions;
 using Shared;
 using AutoMapper;
 using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -34,11 +35,29 @@ namespace API.Services
         /// </summary>
         /// <param name="session">The session to be created.</param>
         /// <returns>The created session.</returns>
-        public Session CreateSession(Session session)
+        public async Task<Session> CreateSessionAsync(Session session)
         {
-            _dbContext.Sessions.Add(_mapper.Map<SessionEntity>(session));
-            _dbContext.SaveChanges();
-            return session;
+            try
+            {
+                var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.Id == session.Profile.Id);
+                if (existingProfile == null)
+                    throw new NotCreatedExecption("Profile does not exist.");
+
+                var entity = _mapper.Map<SessionEntity>(session);
+
+                entity.ProfileId = existingProfile.Id;
+                entity.Profile = null;
+                _dbContext.Entry(existingProfile).State = EntityState.Unchanged;
+
+                _dbContext.Sessions.Add(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return _mapper.Map<Session>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to create session.", ex);
+            }
         }
 
         /// <summary>
@@ -60,6 +79,7 @@ namespace API.Services
         {
             var totalItems = _dbContext.Sessions.Count();
             var items = _dbContext.Sessions
+                .Include(s => s.Profile)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -78,7 +98,7 @@ namespace API.Services
         /// <returns>A list of all Session for one user.</returns>
         public PaginationResult<Session> GetSessionsFromUser(int id)
         {
-            var items = _dbContext.Sessions.Where(q => q.Profile.Id == id).ToList();
+            var items = _dbContext.Sessions.Include(s => s.Profile).Where(q => q.Profile.Id == id).ToList();
             var totalItems = items.Count();
 
             return new PaginationResult<Session>
@@ -96,7 +116,7 @@ namespace API.Services
         /// <returns>The session with the specified identifier.</returns>
         public Session GetSessionById(int sessionId)
         {
-            return _mapper.Map<Session>(_dbContext.Sessions.FirstOrDefault(s => s.Id == sessionId));
+            return _mapper.Map<Session>(_dbContext.Sessions.Include(s => s.Profile).FirstOrDefault(s => s.Id == sessionId));
         }
 
         /// <summary>

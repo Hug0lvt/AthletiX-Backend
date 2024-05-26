@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(IdentityAppDbContext))]
-    [Migration("20240526095301_Ath-v2")]
+    [Migration("20240526151457_Ath-v2")]
     partial class Athv2
     {
         /// <inheritdoc />
@@ -586,7 +586,7 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dommain.Entities.SessionEntity", "SessionEntity")
+                    b.HasOne("Dommain.Entities.SessionEntity", "Session")
                         .WithMany()
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -594,7 +594,7 @@ namespace API.Migrations
 
                     b.Navigation("Category");
 
-                    b.Navigation("SessionEntity");
+                    b.Navigation("Session");
                 });
 
             modelBuilder.Entity("Dommain.Entities.MessageEntity", b =>
