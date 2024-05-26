@@ -51,6 +51,8 @@ namespace API.Services
 
                 entity.CategoryId = existingCategory.Id;
                 entity.ProfileId = existingProfile.Id;
+                entity.Publisher = null;
+                entity.Category = null;
 
                 _dbContext.Entry(existingCategory).State = EntityState.Unchanged;
                 _dbContext.Entry(existingProfile).State = EntityState.Unchanged;
@@ -83,7 +85,10 @@ namespace API.Services
         /// <returns>The post with the specified identifier.</returns>
         public Post GetPostById(int postId)
         {
-            return _mapper.Map<Post>(_dbContext.Posts.FirstOrDefault(p => p.Id == postId));
+            return _mapper.Map<Post>(_dbContext.Posts
+                .Include(p => p.Category)
+                .Include(p => p.Publisher)
+                .FirstOrDefault(p => p.Id == postId));
         }
 
         /// <summary>
@@ -93,7 +98,7 @@ namespace API.Services
         /// <returns>The paginated list of posts with the specified category id.</returns>
         public PaginationResult<Post> GetPostsByCategory(int categoryId)
         {
-            var items = _dbContext.Posts
+            var items = _dbContext.Posts.Include(p => p.Category).Include(p => p.Publisher)
                 .Where(p => p.Category.Id == categoryId)
                 .ToList();
             var totalItems = items.Count();
@@ -112,7 +117,7 @@ namespace API.Services
         /// <returns>The list of posts with the specified user id.</returns>
         public PaginationResult<Post> GetPostsByUser(int userId)
         {
-            var items = _dbContext.Posts
+            var items = _dbContext.Posts.Include(p => p.Category).Include(p => p.Publisher)
                 .Where(p => p.Publisher.Id == userId)
                 .ToList();
             var totalItems = items.Count();
