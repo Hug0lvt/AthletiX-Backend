@@ -7,6 +7,8 @@ using AutoMapper;
 using Dommain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Domain.Entities;
+using Profile = Model.Profile;
 
 namespace API.Services
 {
@@ -216,6 +218,75 @@ namespace API.Services
 
             _logger.LogTrace("[LOG | PostService] - (DeletePost): Post not found");
             throw new NotFoundException("[LOG | PostService] - (DeletePost): Post not found");
+        }
+
+        /// <summary>
+        /// Add a like on post.
+        /// </summary>
+        public async Task<bool> LikePost(int postId, int profileId)
+        {
+            var existingPost = await _dbContext.Posts.FirstOrDefaultAsync(c => c.Id == postId);
+            if (existingPost == null)
+                throw new NotCreatedExecption("Post does not exist.");
+
+            var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.Id == profileId);
+            if (existingProfile == null)
+                throw new NotCreatedExecption("Profile does not exist.");
+
+            _dbContext.LikedPosts.Add(new LikedPostEntity { Id = 0, LikedPostId = postId, LikedByThisProfileId = profileId });
+            _dbContext.SaveChanges();
+            return true;
+        }
+
+        /// <summary>
+        /// Remove a like on a post.
+        /// </summary>
+        public async Task<bool> UnlikePost(int postId, int profileId)
+        {
+            var existingPost = await _dbContext.Posts.FirstOrDefaultAsync(c => c.Id == postId);
+            if (existingPost == null)
+                throw new NotCreatedExecption("Post does not exist.");
+
+            var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.Id == profileId);
+            if (existingProfile == null)
+                throw new NotCreatedExecption("Profile does not exist.");
+
+            var existingPostLikedByThisProfile = await _dbContext.LikedPosts
+                .FirstOrDefaultAsync(l => l.LikedPostId == postId && l.LikedByThisProfileId == profileId);
+            if (existingPostLikedByThisProfile == null)
+                throw new NotFoundException("Profile not like this post.");
+
+            _dbContext.LikedPosts.Remove(existingPostLikedByThisProfile);
+            _dbContext.SaveChanges();
+            return true;
+        }
+
+        public PaginationResult<Profile> GetLikesPostById(int postId)
+        {
+            List<Profile> profiles = _mapper.Map<List<Profile>>(_dbContext.LikedPosts
+                .Include(p => p.LikedByThisProfile)
+                .Where(p => p.LikedPostId == postId)
+                .Select(p => p.LikedByThisProfile));
+
+            return new PaginationResult<Profile>
+            {
+                Items = profiles,
+                TotalItems = profiles.Count()
+            };
+        }
+
+        public PaginationResult<Post> GetPostLikedByProfile(int profileId)
+        {
+            List<Post> posts = _mapper.Map<List<Post>>(_dbContext.LikedPosts
+                .Include(p => p.LikedPost)
+                .Where(p => p.LikedByThisProfileId == profileId)
+                .Select(p => p.LikedPost));
+
+            return new PaginationResult<Post>
+            {
+                Items = posts,
+                TotalItems = posts.Count()
+            };
         }
     }
 }

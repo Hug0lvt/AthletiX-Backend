@@ -102,9 +102,10 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LikedByThisProfileId");
-
                     b.HasIndex("LikedPostId");
+
+                    b.HasIndex("LikedByThisProfileId", "LikedPostId")
+                        .IsUnique();
 
                     b.ToTable("LikedPosts");
                 });
@@ -203,9 +204,10 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConversationId");
-
                     b.HasIndex("ProfileId");
+
+                    b.HasIndex("ConversationId", "ProfileId")
+                        .IsUnique();
 
                     b.ToTable("ConversationMembers");
                 });

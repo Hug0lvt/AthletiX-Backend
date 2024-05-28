@@ -482,9 +482,10 @@ namespace API.Migrations
                 column: "ProfileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConversationMembers_ConversationId",
+                name: "IX_ConversationMembers_ConversationId_ProfileId",
                 table: "ConversationMembers",
-                column: "ConversationId");
+                columns: new[] { "ConversationId", "ProfileId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ConversationMembers_ProfileId",
@@ -502,9 +503,10 @@ namespace API.Migrations
                 column: "SessionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LikedPosts_LikedByThisProfileId",
+                name: "IX_LikedPosts_LikedByThisProfileId_LikedPostId",
                 table: "LikedPosts",
-                column: "LikedByThisProfileId");
+                columns: new[] { "LikedByThisProfileId", "LikedPostId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_LikedPosts_LikedPostId",

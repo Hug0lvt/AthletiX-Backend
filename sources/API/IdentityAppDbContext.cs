@@ -30,6 +30,14 @@ namespace API
 
             modelBuilder.Entity<CategoryEntity>().HasIndex(u => u.Title).IsUnique();
             modelBuilder.Entity<ProfileEntity>().HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<LikedPostEntity>()
+            .HasIndex(l => new { l.LikedByThisProfileId, l.LikedPostId })
+            .IsUnique();
+
+            modelBuilder.Entity<ConversationMembersEntity>()
+            .HasIndex(c => new { c.ConversationId, c.ProfileId })
+            .IsUnique();
             // TODO A COMPLETER
         }
     }

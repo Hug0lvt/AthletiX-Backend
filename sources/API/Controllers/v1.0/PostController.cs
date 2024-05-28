@@ -149,12 +149,11 @@ namespace API.Controllers.v1_0
         [HttpPost("{postId}/likedby/{profileId}", Name = "POST - Entrypoint for like post by profile")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddMemberInConversation(int conversationId, int profileId)
+        public async Task<IActionResult> AddMemberInConversation(int postId, int profileId)
         {
             try
             {
-                // TODO
-                return Ok(/*await _conversationService.AddMemberToConversation(conversationId, profileId)*/);
+                return Ok(await _postService.LikePost(postId, profileId));
             }
             catch (Exception ex)
             {
@@ -168,12 +167,11 @@ namespace API.Controllers.v1_0
         [HttpDelete("{postId}/unlikedby/{profileId}", Name = "POST - Entrypoint for unlike post by profile")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> RemoveMemberInConversation(int conversationId, int profileId)
+        public async Task<IActionResult> RemoveMemberInConversation(int postId, int profileId)
         {
             try
             {
-                // TODO
-                return Ok(/*await _conversationService.AddMemberToConversation(conversationId, profileId)*/);
+                return Ok(await _postService.UnlikePost(postId, profileId));
             }
             catch (Exception ex)
             {
@@ -191,15 +189,7 @@ namespace API.Controllers.v1_0
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetLikesPostById(int postId)
         {
-            // TODO
-            /*var post = _postService.GetPostById(postId);
-
-            if (post == null)
-            {
-                return NotFound();
-            }*/
-
-            return Ok();
+            return Ok(_postService.GetLikesPostById(postId));
         }
 
         /// <summary>
@@ -210,9 +200,7 @@ namespace API.Controllers.v1_0
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetLikedPostByUser(int userId)
         {
-            // TODO
-
-            return Ok();
+            return Ok(_postService.GetPostLikedByProfile(userId));
         }
     }
 }

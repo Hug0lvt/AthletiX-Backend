@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(IdentityAppDbContext))]
-    [Migration("20240528130829_Ath-v2")]
+    [Migration("20240528194802_Ath-v2")]
     partial class Athv2
     {
         /// <inheritdoc />
@@ -105,9 +105,10 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LikedByThisProfileId");
-
                     b.HasIndex("LikedPostId");
+
+                    b.HasIndex("LikedByThisProfileId", "LikedPostId")
+                        .IsUnique();
 
                     b.ToTable("LikedPosts");
                 });
@@ -206,9 +207,10 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConversationId");
-
                     b.HasIndex("ProfileId");
+
+                    b.HasIndex("ConversationId", "ProfileId")
+                        .IsUnique();
 
                     b.ToTable("ConversationMembers");
                 });
