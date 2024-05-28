@@ -5,6 +5,7 @@ using Shared.Exceptions;
 using Shared;
 using AutoMapper;
 using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -34,11 +35,39 @@ namespace API.Services
         /// </summary>
         /// <param name="message">The message to be created.</param>
         /// <returns>The created message.</returns>
-        public Message CreateMessage(Message message)
+        public async Task<Message> CreateMessageAsync(Message message)
         {
-            _dbContext.Messages.Add(_mapper.Map<MessageEntity>(message));
-            _dbContext.SaveChanges();
-            return message;
+            try
+            {
+                var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.Id == message.Sender.Id);
+                if (existingProfile == null)
+                    throw new NotCreatedExecption("Profile does not exist.");
+
+                var existingConversation = await _dbContext.Conversations.FirstOrDefaultAsync(c => c.Id == message.ConversationId);
+                if (existingConversation == null)
+                    throw new NotCreatedExecption("Conversation does not exist.");
+
+                var entity = _mapper.Map<MessageEntity>(message);
+
+                entity.ConversationId = existingConversation.Id;
+                entity.ProfileId = existingProfile.Id;
+                entity.Sender = null;
+                entity.Conversation = null;
+
+                _dbContext.Entry(existingConversation).State = EntityState.Unchanged;
+                _dbContext.Entry(existingProfile).State = EntityState.Unchanged;
+
+                _dbContext.Messages.Add(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return _mapper.Map<Message>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to create message.", ex);
+            }
+
+            // TODO Send Notification
         }
 
         /// <summary>
@@ -59,14 +88,40 @@ namespace API.Services
             int pageNumber = 0)
         {
             var totalItems = _dbContext.Messages.Count();
-            var items = _dbContext.Messages
+            var items = _mapper.Map<List<Message>>(_dbContext.Messages
+                .Include(m => m.Sender)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
-                .ToList();
+                .ToList());
 
             return new PaginationResult<Message>
             {
-                Items = _mapper.Map<List<Message>>(items),
+                Items = items,
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
+        }
+
+        /// <summary>
+        /// Gets all Message (with pages).
+        /// </summary>
+        /// <returns>A list of all Message.</returns>
+        public PaginationResult<Message> GetAllMessagesWithPagesForConversation(
+            int conversationId,
+            int pageSize = 10,
+            int pageNumber = 0)
+        {
+            var totalItems = _dbContext.Messages.Count();
+            var items = _mapper.Map<List<Message>>(_dbContext.Messages
+                .Where(c => c.ConversationId == conversationId)
+                .Include(m => m.Sender)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList());
+
+            return new PaginationResult<Message>
+            {
+                Items = items,
                 NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
                 TotalItems = totalItems
             };
@@ -79,7 +134,9 @@ namespace API.Services
         /// <returns>The message with the specified identifier.</returns>
         public Message GetMessageById(int messageId)
         {
-            return _mapper.Map<Message>(_dbContext.Messages.FirstOrDefault(m => m.Id == messageId));
+            return _mapper.Map<Message>(_dbContext.Messages
+                .Include(m => m.Sender)
+                .FirstOrDefault(m => m.Id == messageId));
         }
 
         /// <summary>

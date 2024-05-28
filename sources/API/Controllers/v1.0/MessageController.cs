@@ -34,9 +34,9 @@ namespace API.Controllers.v1_0
         /// <returns>The newly created message.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Message")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreateMessage([FromBody] Message message)
+        public async Task<IActionResult> CreateMessage([FromBody] Message message)
         {
-            var createdMessage = _messageService.CreateMessage(message);
+            var createdMessage = await _messageService.CreateMessageAsync(message);
             return CreatedAtAction(nameof(GetMessageById), new { messageId = createdMessage.Id }, createdMessage);
         }
 
@@ -63,6 +63,21 @@ namespace API.Controllers.v1_0
             [FromQuery] int pageNumber = 0)
         {
             var messages = _messageService.GetAllMessagesWithPages(pageSize, pageNumber);
+            return Ok(messages);
+        }
+
+        /// <summary>
+        /// Gets all Message with pages.
+        /// </summary>
+        /// <returns>A list of all Message.</returns>
+        [HttpGet("conversation/{conversationId}/pages", Name = "GET - Entrypoint for get all Messages with pages for one conversation")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllMessagesWithPagesForConversation(
+            int conversationId,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
+        {
+            var messages = _messageService.GetAllMessagesWithPagesForConversation(conversationId, pageSize, pageNumber);
             return Ok(messages);
         }
 
