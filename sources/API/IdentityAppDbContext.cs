@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Dommain.Entities;
 using Model;
+using Domain.Entities;
 
 namespace API
 {
@@ -14,6 +15,7 @@ namespace API
         public DbSet<ExerciseEntity> Exercises { get; set; }
         public DbSet<MessageEntity> Messages { get; set; }
         public DbSet<PostEntity> Posts { get; set; }
+        public DbSet<LikedPostEntity> LikedPosts { get; set; }
         public DbSet<ProfileEntity> Profiles { get; set; }
         public DbSet<SessionEntity> Sessions { get; set; }
         public DbSet<SetEntity> Sets { get; set; }

@@ -142,5 +142,77 @@ namespace API.Controllers.v1_0
                 return NotFound(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Add a like to a post.
+        /// </summary>
+        [HttpPost("{postId}/likedby/{profileId}", Name = "POST - Entrypoint for like post by profile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddMemberInConversation(int conversationId, int profileId)
+        {
+            try
+            {
+                // TODO
+                return Ok(/*await _conversationService.AddMemberToConversation(conversationId, profileId)*/);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Unlike post with profile.
+        /// </summary>
+        [HttpDelete("{postId}/unlikedby/{profileId}", Name = "POST - Entrypoint for unlike post by profile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RemoveMemberInConversation(int conversationId, int profileId)
+        {
+            try
+            {
+                // TODO
+                return Ok(/*await _conversationService.AddMemberToConversation(conversationId, profileId)*/);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets a number of likes on this post by its identifier.
+        /// </summary>
+        /// <param name="postId">The post identifier.</param>
+        /// <returns>The post with the specified identifier.</returns>
+        [HttpGet("{postId}/likes", Name = "GET - Entrypoint for get likes Post by Id")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult GetLikesPostById(int postId)
+        {
+            // TODO
+            /*var post = _postService.GetPostById(postId);
+
+            if (post == null)
+            {
+                return NotFound();
+            }*/
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Retrieves a paginated list of liked posts by user identifier.
+        /// </summary>
+        [HttpGet("likedby/{userId}", Name = "GET - Entrypoint for retrieving liked posts by user")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult GetLikedPostByUser(int userId)
+        {
+            // TODO
+
+            return Ok();
+        }
     }
 }
