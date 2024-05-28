@@ -33,6 +33,18 @@ namespace API.Services
             _mapper = mapper;
         }
 
+        public bool IsVideoExtension(string extension)
+        {
+            string[] videoExtensions = { ".mp4", ".avi", ".mov", ".mkv" };
+            return Array.Exists(videoExtensions, ext => ext.Equals(extension, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public bool IsImageExtension(string extension)
+        {
+            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
+            return Array.Exists(imageExtensions, ext => ext.Equals(extension, StringComparison.OrdinalIgnoreCase));
+        }
+
         /// <summary>
         /// Creates a new post.
         /// </summary>

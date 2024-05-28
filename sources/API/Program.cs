@@ -161,7 +161,7 @@ if (!Directory.Exists(physicalPath)) Directory.CreateDirectory(physicalPath);
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(physicalPath),
-    RequestPath = new PathString("/videos")
+    RequestPath = new PathString("/videos") // TODO Protect le /videos ??
 });
 #endregion
 

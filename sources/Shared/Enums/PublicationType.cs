@@ -8,6 +8,7 @@ namespace Shared.Enums
 {
     public enum PublicationType
     {
+        Unknown,
         Image,
         Video
     }

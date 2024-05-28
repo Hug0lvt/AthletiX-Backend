@@ -209,6 +209,9 @@ namespace API.Controllers.v1_0
         {
             if (file == null || file.Length == 0) return BadRequest("No file provided.");
 
+            var existingPost = _postService.GetPostById(postId);
+            if(existingPost == null) return BadRequest("Post Not Exists");
+
             var originalFileName = Path.GetFileName(file.FileName);
             var extension = Path.GetExtension(originalFileName);
             var newFileName = $"Ath-{originalFileName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}-{postId}{extension}";
@@ -219,12 +222,13 @@ namespace API.Controllers.v1_0
                 await file.CopyToAsync(stream);
             }
 
-            var videoUrl = $"{Request.Scheme}://{Request.Host}/videos/{newFileName}"; // TODO A test sur codefirst
+            var fileUrl = $"{Request.Scheme}://{Request.Host}/videos/{newFileName}"; // TODO A test sur codefirst
 
-            // TODO Add la logique pour return un post avec l'url !
-            // Protect le /videos ??
+            existingPost.Content = fileUrl;
+            if (_postService.IsVideoExtension(extension)) existingPost.PublicationType = Shared.Enums.PublicationType.Video;
+            if (_postService.IsImageExtension(extension)) existingPost.PublicationType = Shared.Enums.PublicationType.Image;
 
-            return Ok(new { path = videoUrl });
+            return Ok(_postService.UpdatePost(postId, existingPost));
         }
     }
 }
