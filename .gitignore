@@ -1,5 +1,9 @@
 #Project
-athv1/ # Dossier des posts
+*.mp4
+*.mp3
+*.png
+*.jpg
+*jpeg
 
 # ---> VisualStudio
 ## Ignore Visual Studio temporary files, build results, and
