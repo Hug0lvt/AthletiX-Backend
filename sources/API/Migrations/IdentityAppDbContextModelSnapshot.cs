@@ -86,6 +86,29 @@ namespace API.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.LikedPostEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LikedByThisProfileId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("LikedPostId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LikedByThisProfileId");
+
+                    b.HasIndex("LikedPostId");
+
+                    b.ToTable("LikedPosts");
+                });
+
             modelBuilder.Entity("Dommain.Entities.CategoryEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -529,6 +552,25 @@ namespace API.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.LikedPostEntity", b =>
+                {
+                    b.HasOne("Dommain.Entities.ProfileEntity", "LikedByThisProfile")
+                        .WithMany()
+                        .HasForeignKey("LikedByThisProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dommain.Entities.PostEntity", "LikedPost")
+                        .WithMany()
+                        .HasForeignKey("LikedPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LikedByThisProfile");
+
+                    b.Navigation("LikedPost");
                 });
 
             modelBuilder.Entity("Dommain.Entities.CommentEntity", b =>

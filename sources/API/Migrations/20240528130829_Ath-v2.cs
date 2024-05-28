@@ -346,6 +346,32 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LikedPosts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    LikedByThisProfileId = table.Column<int>(type: "integer", nullable: false),
+                    LikedPostId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LikedPosts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LikedPosts_Posts_LikedPostId",
+                        column: x => x.LikedPostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LikedPosts_Profiles_LikedByThisProfileId",
+                        column: x => x.LikedByThisProfileId,
+                        principalTable: "Profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Exercises",
                 columns: table => new
                 {
@@ -476,6 +502,16 @@ namespace API.Migrations
                 column: "SessionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LikedPosts_LikedByThisProfileId",
+                table: "LikedPosts",
+                column: "LikedByThisProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LikedPosts_LikedPostId",
+                table: "LikedPosts",
+                column: "LikedPostId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messages_ConversationId",
                 table: "Messages",
                 column: "ConversationId");
@@ -535,6 +571,9 @@ namespace API.Migrations
 
             migrationBuilder.DropTable(
                 name: "ConversationMembers");
+
+            migrationBuilder.DropTable(
+                name: "LikedPosts");
 
             migrationBuilder.DropTable(
                 name: "Messages");
