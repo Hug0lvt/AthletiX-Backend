@@ -9,6 +9,7 @@ using API;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using API.Mappers;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -153,6 +154,16 @@ app.UseSwaggerUI();// NE PAS LAISSER EN PROD
 #endregion
 
 //app.UseHttpsRedirection(); //Casser avec Codefirst
+
+# region Post File System
+var physicalPath = Path.Combine(Directory.GetCurrentDirectory(), "athv1", "posts");
+if (!Directory.Exists(physicalPath)) Directory.CreateDirectory(physicalPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(physicalPath),
+    RequestPath = new PathString("/videos")
+});
+#endregion
 
 app.UseAuthorization();
 app.MapIdentityApi<AppUser>();

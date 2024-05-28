@@ -17,6 +17,7 @@ namespace API.Controllers.v1_0
     public class PostController : ControllerBase
     {
         private readonly PostService _postService;
+        private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "athv1", "posts");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostController"/> class.
@@ -201,6 +202,29 @@ namespace API.Controllers.v1_0
         public IActionResult GetLikedPostByUser(int userId)
         {
             return Ok(_postService.GetPostLikedByProfile(userId));
+        }
+
+        [HttpPost("{postId}/upload")]
+        public async Task<IActionResult> Upload(IFormFile file, int postId)
+        {
+            if (file == null || file.Length == 0) return BadRequest("No file provided.");
+
+            var originalFileName = Path.GetFileName(file.FileName);
+            var extension = Path.GetExtension(originalFileName);
+            var newFileName = $"Ath-{originalFileName}-{DateTime.Now.ToString("yyyyMMddHHmmss")}-{postId}{extension}";
+            var filePath = Path.Combine(_storagePath, newFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var videoUrl = $"{Request.Scheme}://{Request.Host}/videos/{newFileName}"; // TODO A test sur codefirst
+
+            // TODO Add la logique pour return un post avec l'url !
+            // Protect le /videos ??
+
+            return Ok(new { path = videoUrl });
         }
     }
 }
