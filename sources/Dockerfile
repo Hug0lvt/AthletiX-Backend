@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER root
 WORKDIR /app
 # Create the necessary directories and set permissions for the app user
-RUN mkdir -p /app/athv1 && chown -R app:app /app
+RUN mkdir -p /app/athv1/posts && chown -R app:app /app
 # Switch back to the app user
 USER app
 EXPOSE 8080
