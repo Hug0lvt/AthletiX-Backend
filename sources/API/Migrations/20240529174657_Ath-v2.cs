@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -8,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class AthAuth : Migration
+    public partial class Athv2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,7 +57,7 @@ namespace API.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Title = table.Column<string>(type: "text", nullable: false)
+                    Title = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -70,11 +69,34 @@ namespace API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Picture = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Conversations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Profiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Username = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    UniqueNotificationToken = table.Column<string>(type: "text", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false),
+                    Age = table.Column<int>(type: "integer", nullable: false),
+                    Email = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    Weight = table.Column<float>(type: "real", nullable: false),
+                    Height = table.Column<float>(type: "real", nullable: false),
+                    Gender = table.Column<bool>(type: "boolean", nullable: false),
+                    Picture = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Profiles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -184,28 +206,29 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Profiles",
+                name: "ConversationMembers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Username = table.Column<string>(type: "text", nullable: false),
-                    UniqueNotificationToken = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<int>(type: "integer", nullable: false),
-                    Age = table.Column<int>(type: "integer", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    Weight = table.Column<float>(type: "real", nullable: false),
-                    Height = table.Column<float>(type: "real", nullable: false),
-                    ConversationId = table.Column<int>(type: "integer", nullable: true)
+                    ConversationId = table.Column<int>(type: "integer", nullable: false),
+                    ProfileId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Profiles", x => x.Id);
+                    table.PrimaryKey("PK_ConversationMembers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Profiles_Conversations_ConversationId",
+                        name: "FK_ConversationMembers_Conversations_ConversationId",
                         column: x => x.ConversationId,
                         principalTable: "Conversations",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ConversationMembers_Profiles_ProfileId",
+                        column: x => x.ProfileId,
+                        principalTable: "Profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -214,10 +237,10 @@ namespace API.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Content = table.Column<string>(type: "text", nullable: false),
-                    DateSent = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    SenderId = table.Column<int>(type: "integer", nullable: false),
-                    ConversationId = table.Column<int>(type: "integer", nullable: true)
+                    ConversationId = table.Column<int>(type: "integer", nullable: false),
+                    ProfileId = table.Column<int>(type: "integer", nullable: false),
+                    Content = table.Column<string>(type: "character varying(3000)", maxLength: 3000, nullable: false),
+                    DateSent = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -226,10 +249,11 @@ namespace API.Migrations
                         name: "FK_Messages_Conversations_ConversationId",
                         column: x => x.ConversationId,
                         principalTable: "Conversations",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Messages_Profiles_SenderId",
-                        column: x => x.SenderId,
+                        name: "FK_Messages_Profiles_ProfileId",
+                        column: x => x.ProfileId,
                         principalTable: "Profiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -241,7 +265,7 @@ namespace API.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PublisherId = table.Column<int>(type: "integer", nullable: false),
+                    ProfileId = table.Column<int>(type: "integer", nullable: false),
                     CategoryId = table.Column<int>(type: "integer", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
@@ -258,8 +282,8 @@ namespace API.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Posts_Profiles_PublisherId",
-                        column: x => x.PublisherId,
+                        name: "FK_Posts_Profiles_ProfileId",
+                        column: x => x.ProfileId,
                         principalTable: "Profiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -294,27 +318,54 @@ namespace API.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PublishDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PublisherId = table.Column<int>(type: "integer", nullable: false),
-                    Content = table.Column<string>(type: "text", nullable: false),
-                    CommentId = table.Column<int>(type: "integer", nullable: true),
-                    PostId = table.Column<int>(type: "integer", nullable: true)
+                    ProfileId = table.Column<int>(type: "integer", nullable: false),
+                    PostId = table.Column<int>(type: "integer", nullable: false),
+                    Content = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    ParentCommentId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Comments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Comments_Comments_CommentId",
-                        column: x => x.CommentId,
+                        name: "FK_Comments_Comments_ParentCommentId",
+                        column: x => x.ParentCommentId,
                         principalTable: "Comments",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Comments_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Comments_Profiles_PublisherId",
-                        column: x => x.PublisherId,
+                        name: "FK_Comments_Profiles_ProfileId",
+                        column: x => x.ProfileId,
+                        principalTable: "Profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LikedPosts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    LikedByThisProfileId = table.Column<int>(type: "integer", nullable: false),
+                    LikedPostId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LikedPosts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LikedPosts_Posts_LikedPostId",
+                        column: x => x.LikedPostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LikedPosts_Profiles_LikedByThisProfileId",
+                        column: x => x.LikedByThisProfileId,
                         principalTable: "Profiles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -326,11 +377,11 @@ namespace API.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SessionId = table.Column<int>(type: "integer", nullable: false),
+                    CategoryId = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Image = table.Column<string>(type: "text", nullable: false),
-                    CategoryId = table.Column<int>(type: "integer", nullable: false),
-                    SessionId = table.Column<int>(type: "integer", nullable: true)
+                    Image = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -345,7 +396,8 @@ namespace API.Migrations
                         name: "FK_Exercises_Sessions_SessionId",
                         column: x => x.SessionId,
                         principalTable: "Sessions",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -354,11 +406,11 @@ namespace API.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ExerciseId = table.Column<int>(type: "integer", nullable: false),
                     Reps = table.Column<int>(type: "integer", nullable: false),
-                    Weight = table.Column<List<float>>(type: "real[]", nullable: false),
+                    WeightJson = table.Column<string>(type: "text", nullable: false),
                     Rest = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    Mode = table.Column<int>(type: "integer", nullable: false),
-                    ExerciseId = table.Column<int>(type: "integer", nullable: true)
+                    Mode = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -367,7 +419,8 @@ namespace API.Migrations
                         name: "FK_Sets_Exercises_ExerciseId",
                         column: x => x.ExerciseId,
                         principalTable: "Exercises",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -408,9 +461,15 @@ namespace API.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_CommentId",
+                name: "IX_Categories_Title",
+                table: "Categories",
+                column: "Title",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_ParentCommentId",
                 table: "Comments",
-                column: "CommentId");
+                column: "ParentCommentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_PostId",
@@ -418,9 +477,20 @@ namespace API.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_PublisherId",
+                name: "IX_Comments_ProfileId",
                 table: "Comments",
-                column: "PublisherId");
+                column: "ProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConversationMembers_ConversationId_ProfileId",
+                table: "ConversationMembers",
+                columns: new[] { "ConversationId", "ProfileId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConversationMembers_ProfileId",
+                table: "ConversationMembers",
+                column: "ProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exercises_CategoryId",
@@ -433,14 +503,25 @@ namespace API.Migrations
                 column: "SessionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LikedPosts_LikedByThisProfileId_LikedPostId",
+                table: "LikedPosts",
+                columns: new[] { "LikedByThisProfileId", "LikedPostId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LikedPosts_LikedPostId",
+                table: "LikedPosts",
+                column: "LikedPostId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messages_ConversationId",
                 table: "Messages",
                 column: "ConversationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_SenderId",
+                name: "IX_Messages_ProfileId",
                 table: "Messages",
-                column: "SenderId");
+                column: "ProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_CategoryId",
@@ -448,14 +529,15 @@ namespace API.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_PublisherId",
+                name: "IX_Posts_ProfileId",
                 table: "Posts",
-                column: "PublisherId");
+                column: "ProfileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Profiles_ConversationId",
+                name: "IX_Profiles_Email",
                 table: "Profiles",
-                column: "ConversationId");
+                column: "Email",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_ProfileId",
@@ -490,6 +572,12 @@ namespace API.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
+                name: "ConversationMembers");
+
+            migrationBuilder.DropTable(
+                name: "LikedPosts");
+
+            migrationBuilder.DropTable(
                 name: "Messages");
 
             migrationBuilder.DropTable(
@@ -505,6 +593,9 @@ namespace API.Migrations
                 name: "Posts");
 
             migrationBuilder.DropTable(
+                name: "Conversations");
+
+            migrationBuilder.DropTable(
                 name: "Exercises");
 
             migrationBuilder.DropTable(
@@ -515,9 +606,6 @@ namespace API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Profiles");
-
-            migrationBuilder.DropTable(
-                name: "Conversations");
         }
     }
 }

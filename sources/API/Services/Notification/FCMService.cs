@@ -1,9 +1,9 @@
-﻿using API.Exceptions;
-using FirebaseAdmin.Messaging;
+﻿using Shared.Exceptions;
 using Microsoft.Extensions.Logging;
 using Model;
 using System;
 using System.Threading.Tasks;
+using FirebaseAdmin.Messaging;
 
 namespace API.Services.Notification
 {

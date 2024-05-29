@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using API.Services;
 using Model;
-using API.Exceptions;
+using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers.v1_0
@@ -34,9 +34,9 @@ namespace API.Controllers.v1_0
         /// <returns>The newly created comment.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Comment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreateComment([FromBody] Comment comment)
+        public async Task<IActionResult> CreateComment([FromBody] Comment comment)
         {
-            var createdComment = _commentService.CreateComment(comment);
+            var createdComment = await _commentService.CreateCommentAsync(comment);
             return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.Id }, createdComment);
         }
 
@@ -49,6 +49,33 @@ namespace API.Controllers.v1_0
         public IActionResult GetAllComments()
         {
             var comments = _commentService.GetAllComments();
+            return Ok(comments);
+        }
+
+        /// <summary>
+        /// Gets all comments.
+        /// </summary>
+        /// <returns>A list of all comments.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Comments with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllCommentsWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0,
+            bool includeAnswers = false)
+        {
+            var comments = _commentService.GetAllCommentsWithPages(pageSize, pageNumber, includeAnswers);
+            return Ok(comments);
+        }
+
+        /// <summary>
+        /// Gets all comments.
+        /// </summary>
+        /// <returns>A list of all comments.</returns>
+        [HttpGet("post/{postId}", Name = "GET - Entrypoint for get all Comments from post id")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllCommentsFromPost(int postId, bool includeAnswers = false)
+        {
+            var comments = _commentService.GetAllCommentsOnPost(postId, includeAnswers);
             return Ok(comments);
         }
 
@@ -85,6 +112,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if(updatedComment.Id != commentId) updatedComment.Id = commentId;
                 var comment = _commentService.UpdateComment(updatedComment);
                 return Ok(comment);
             }

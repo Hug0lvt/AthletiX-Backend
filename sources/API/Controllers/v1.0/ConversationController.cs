@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using API.Services;
 using Model;
-using API.Exceptions;
+using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using API.Services.Notification;
 
 namespace API.Controllers.v1_0
 {
@@ -53,6 +54,34 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
+        /// Gets all Conversations with pages.
+        /// </summary>
+        /// <returns>A list of all Conversations.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Conversations with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllConversationsWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0,
+            bool includeProfiles = false,
+            bool includeMessages = false)
+        {
+            var conversations = _conversationService.GetAllConversationsWithPages(pageSize, pageNumber, includeProfiles, includeMessages);
+            return Ok(conversations);
+        }
+
+        /// <summary>
+        /// Gets all Conversations with pages.
+        /// </summary>
+        /// <returns>A list of all Conversations.</returns>
+        [HttpGet("user/{userId}", Name = "GET - Entrypoint for get user Conversations")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetConversationsForUser(int userId, bool includeProfiles = false, bool includeMessages = false)
+        {
+            var conversations = _conversationService.GetConversationsForUser(userId, includeProfiles, includeMessages);
+            return Ok(conversations);
+        }
+
+        /// <summary>
         /// Gets a conversation by its identifier.
         /// </summary>
         /// <param name="conversationId">The conversation identifier.</param>
@@ -90,6 +119,46 @@ namespace API.Controllers.v1_0
             catch (NotFoundException ex)
             {
                 return NotFound(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Add a Profile in conversation.
+        /// </summary>
+        /// <param name="profile">The profile.</param>
+        /// <returns>The updated profile.</returns>
+        [HttpPost("{conversationId}/add/user/{profileId}", Name = "POST - Entrypoint for add Profile in conversation")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddMemberInConversation(int conversationId, int profileId)
+        {
+            try
+            {
+                return Ok(await _conversationService.AddMemberToConversation(conversationId, profileId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Remove a Profile in conversation.
+        /// </summary>
+        /// <param name="profile">The profile.</param>
+        /// <returns>The updated profile.</returns>
+        [HttpDelete("{conversationId}/remove/user/{profileId}", Name = "DELETE - Entrypoint for add Profile in conversation")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RemoveMemberInConversation(int conversationId, int profileId)
+        {
+            try
+            {
+                return Ok(await _conversationService.RemoveMemberToConversation(conversationId, profileId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
     }

@@ -22,7 +22,7 @@ namespace API.Controllers.v1_0
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<string> GetVersion()
         {
-            return "1.1.0";
+            return "r1.0.0";
         }
 
     }

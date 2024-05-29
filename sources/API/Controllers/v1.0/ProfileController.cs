@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using API.Services;
 using Model;
-using API.Exceptions;
+using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers.v1_0
@@ -93,6 +93,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if(updatedProfile.Id != profileId) updatedProfile.Id = profileId;
                 var profile = _profileService.UpdateProfile(updatedProfile);
                 return Ok(profile);
             }

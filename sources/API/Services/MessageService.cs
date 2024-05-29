@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
+using Shared.Exceptions;
+using Shared;
+using AutoMapper;
+using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -13,16 +16,18 @@ namespace API.Services
     {
         private readonly ILogger<MessageService> _logger;
         private readonly IdentityAppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessageService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public MessageService(IdentityAppDbContext dbContext, ILogger<MessageService> logger)
+        public MessageService(IdentityAppDbContext dbContext, ILogger<MessageService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,11 +35,39 @@ namespace API.Services
         /// </summary>
         /// <param name="message">The message to be created.</param>
         /// <returns>The created message.</returns>
-        public Message CreateMessage(Message message)
+        public async Task<Message> CreateMessageAsync(Message message)
         {
-            _dbContext.Messages.Add(message);
-            _dbContext.SaveChanges();
-            return message;
+            try
+            {
+                var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.Id == message.Sender.Id);
+                if (existingProfile == null)
+                    throw new NotCreatedExecption("Profile does not exist.");
+
+                var existingConversation = await _dbContext.Conversations.FirstOrDefaultAsync(c => c.Id == message.ConversationId);
+                if (existingConversation == null)
+                    throw new NotCreatedExecption("Conversation does not exist.");
+
+                var entity = _mapper.Map<MessageEntity>(message);
+
+                entity.ConversationId = existingConversation.Id;
+                entity.ProfileId = existingProfile.Id;
+                entity.Sender = null;
+                entity.Conversation = null;
+
+                _dbContext.Entry(existingConversation).State = EntityState.Unchanged;
+                _dbContext.Entry(existingProfile).State = EntityState.Unchanged;
+
+                _dbContext.Messages.Add(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return _mapper.Map<Message>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to create message.", ex);
+            }
+
+            // TODO Send Notification
         }
 
         /// <summary>
@@ -43,7 +76,55 @@ namespace API.Services
         /// <returns>A list of all messages.</returns>
         public List<Message> GetAllMessages()
         {
-            return _dbContext.Messages.ToList();
+            return _mapper.Map<List<Message>>(_dbContext.Messages.ToList());
+        }
+
+        /// <summary>
+        /// Gets all Message (with pages).
+        /// </summary>
+        /// <returns>A list of all Message.</returns>
+        public PaginationResult<Message> GetAllMessagesWithPages(
+            int pageSize = 10,
+            int pageNumber = 0)
+        {
+            var totalItems = _dbContext.Messages.Count();
+            var items = _mapper.Map<List<Message>>(_dbContext.Messages
+                .Include(m => m.Sender)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList());
+
+            return new PaginationResult<Message>
+            {
+                Items = items,
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
+        }
+
+        /// <summary>
+        /// Gets all Message (with pages).
+        /// </summary>
+        /// <returns>A list of all Message.</returns>
+        public PaginationResult<Message> GetAllMessagesWithPagesForConversation(
+            int conversationId,
+            int pageSize = 10,
+            int pageNumber = 0)
+        {
+            var totalItems = _dbContext.Messages.Count();
+            var items = _mapper.Map<List<Message>>(_dbContext.Messages
+                .Where(c => c.ConversationId == conversationId)
+                .Include(m => m.Sender)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList());
+
+            return new PaginationResult<Message>
+            {
+                Items = items,
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
         }
 
         /// <summary>
@@ -53,7 +134,9 @@ namespace API.Services
         /// <returns>The message with the specified identifier.</returns>
         public Message GetMessageById(int messageId)
         {
-            return _dbContext.Messages.FirstOrDefault(m => m.Id == messageId);
+            return _mapper.Map<Message>(_dbContext.Messages
+                .Include(m => m.Sender)
+                .FirstOrDefault(m => m.Id == messageId));
         }
 
         /// <summary>
@@ -69,7 +152,7 @@ namespace API.Services
             {
                 existingMessage.Content = updatedMessage.Content;
                 _dbContext.SaveChanges();
-                return existingMessage;
+                return _mapper.Map<Message>(existingMessage);
             }
 
             _logger.LogTrace("[LOG | MessageService] - (UpdateMessage): Message not found");
@@ -89,7 +172,7 @@ namespace API.Services
             {
                 _dbContext.Messages.Remove(messageToDelete);
                 _dbContext.SaveChanges();
-                return messageToDelete;
+                return _mapper.Map<Message>(messageToDelete);
             }
 
             _logger.LogTrace("[LOG | MessageService] - (DeleteMessage): Message not found");

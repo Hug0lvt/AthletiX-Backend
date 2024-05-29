@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
+using Shared.Exceptions;
+using Shared;
+using AutoMapper;
+using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -13,16 +16,18 @@ namespace API.Services
     {
         private readonly ILogger<SetService> _logger;
         private readonly IdentityAppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SetService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public SetService(IdentityAppDbContext dbContext, ILogger<SetService> logger)
+        public SetService(IdentityAppDbContext dbContext, ILogger<SetService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,11 +35,29 @@ namespace API.Services
         /// </summary>
         /// <param name="set">The set to be created.</param>
         /// <returns>The created set.</returns>
-        public Set CreateSet(Set set)
+        public async Task<Set> CreateSetAsync(Set set)
         {
-            _dbContext.Sets.Add(set);
-            _dbContext.SaveChanges();
-            return set;
+            try
+            {
+                var existingExercise = await _dbContext.Exercises.FirstOrDefaultAsync(p => p.Id == set.Exercise.Id);
+                if (existingExercise == null)
+                    throw new NotCreatedExecption("Exercise does not exist.");
+
+                var entity = _mapper.Map<SetEntity>(set);
+
+                entity.ExerciseId = existingExercise.Id;
+                entity.Exercise = null;
+                _dbContext.Entry(existingExercise).State = EntityState.Unchanged;
+
+                _dbContext.Sets.Add(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return _mapper.Map<Set>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to create set.", ex);
+            }
         }
 
         /// <summary>
@@ -43,7 +66,30 @@ namespace API.Services
         /// <returns>A list of all sets.</returns>
         public List<Set> GetAllSets()
         {
-            return _dbContext.Sets.ToList();
+            return _mapper.Map<List<Set>>(_dbContext.Sets.ToList());
+        }
+
+        /// <summary>
+        /// Gets all Sets (with pages).
+        /// </summary>
+        /// <returns>A list of all Sets.</returns>
+        public PaginationResult<Set> GetAllSetsWithPages(
+            int pageSize = 10,
+            int pageNumber = 0)
+        {
+            var totalItems = _dbContext.Sets.Count();
+            var items = _dbContext.Sets
+                .Include(s => s.Exercise)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new PaginationResult<Set>
+            {
+                Items = _mapper.Map<List<Set>>(items),
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
         }
 
         /// <summary>
@@ -53,7 +99,9 @@ namespace API.Services
         /// <returns>The set with the specified identifier.</returns>
         public Set GetSetById(int setId)
         {
-            return _dbContext.Sets.FirstOrDefault(s => s.Id == setId);
+            return _mapper.Map<Set>(_dbContext.Sets
+                .Include(s => s.Exercise)
+                .FirstOrDefault(s => s.Id == setId));
         }
 
         /// <summary>
@@ -72,7 +120,7 @@ namespace API.Services
                 existingSet.Rest = updatedSet.Rest;
                 existingSet.Mode = updatedSet.Mode;
                 _dbContext.SaveChanges();
-                return existingSet;
+                return _mapper.Map<Set>(existingSet);
             }
 
             _logger.LogTrace("[LOG | SetService] - (UpdateSet): Set not found");
@@ -92,7 +140,7 @@ namespace API.Services
             {
                 _dbContext.Sets.Remove(setToDelete);
                 _dbContext.SaveChanges();
-                return setToDelete;
+                return _mapper.Map<Set>(setToDelete);
             }
 
             _logger.LogTrace("[LOG | SetService] - (DeleteSet): Set not found");

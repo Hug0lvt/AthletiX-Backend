@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using API.Services;
 using Model;
-using API.Exceptions;
+using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers.v1_0
@@ -34,9 +34,9 @@ namespace API.Controllers.v1_0
         /// <returns>The newly created set.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Set")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreateSet([FromBody] Set set)
+        public async Task<IActionResult> CreateSet([FromBody] Set set)
         {
-            var createdSet = _setService.CreateSet(set);
+            var createdSet = await _setService.CreateSetAsync(set);
             return CreatedAtAction(nameof(GetSetById), new { setId = createdSet.Id }, createdSet);
         }
 
@@ -49,6 +49,20 @@ namespace API.Controllers.v1_0
         public IActionResult GetAllSets()
         {
             var sets = _setService.GetAllSets();
+            return Ok(sets);
+        }
+
+        /// <summary>
+        /// Gets all Sets with pages.
+        /// </summary>
+        /// <returns>A list of all Sets.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Sets with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllSetsWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
+        {
+            var sets = _setService.GetAllSetsWithPages(pageSize, pageNumber);
             return Ok(sets);
         }
 
@@ -85,6 +99,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if(updatedSet.Id != setId) updatedSet.Id = setId;
                 var set = _setService.UpdateSet(updatedSet);
                 return Ok(set);
             }

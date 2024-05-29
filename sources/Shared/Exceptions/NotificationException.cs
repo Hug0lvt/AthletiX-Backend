@@ -1,4 +1,4 @@
-﻿namespace API.Exceptions
+﻿namespace Shared.Exceptions
 {
     /// <summary>
     /// Exception thrown when an error occurs related to notifications.

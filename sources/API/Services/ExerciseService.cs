@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
+using Shared.Exceptions;
+using Shared;
+using AutoMapper;
+using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -13,16 +16,18 @@ namespace API.Services
     {
         private readonly ILogger<ExerciseService> _logger;
         private readonly IdentityAppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExerciseService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public ExerciseService(IdentityAppDbContext dbContext, ILogger<ExerciseService> logger)
+        public ExerciseService(IdentityAppDbContext dbContext, ILogger<ExerciseService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,11 +35,37 @@ namespace API.Services
         /// </summary>
         /// <param name="exercise">The exercise to be created.</param>
         /// <returns>The created exercise.</returns>
-        public Exercise CreateExercise(Exercise exercise)
+        public async Task<Exercise> CreateExerciseAsync(Exercise exercise)
         {
-            _dbContext.Exercises.Add(exercise);
-            _dbContext.SaveChanges();
-            return exercise;
+            try
+            {
+                var existingCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == exercise.Category.Id);
+                if (existingCategory == null)
+                    throw new NotCreatedExecption("Category does not exist.");
+
+                var existingSession = await _dbContext.Sessions.FirstOrDefaultAsync(s => s.Id == exercise.Session.Id);
+                if (existingSession == null)
+                    throw new NotCreatedExecption("Session does not exist.");
+
+                var entity = _mapper.Map<ExerciseEntity>(exercise);
+
+                entity.CategoryId = existingCategory.Id;
+                entity.SessionId = existingSession.Id;
+                entity.Session = null;
+                entity.Category = null;
+
+                _dbContext.Entry(existingCategory).State = EntityState.Unchanged;
+                _dbContext.Entry(existingSession).State = EntityState.Unchanged;
+
+                _dbContext.Exercises.Add(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return _mapper.Map<Exercise>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to create exercise.", ex);
+            }
         }
 
         /// <summary>
@@ -43,7 +74,79 @@ namespace API.Services
         /// <returns>A list of all exercises.</returns>
         public List<Exercise> GetAllExercises()
         {
-            return _dbContext.Exercises.ToList();
+            return _mapper.Map<List<Exercise>>(_dbContext.Exercises.ToList());
+        }
+
+        /// <summary>
+        /// Gets all Exercise (with pages).
+        /// </summary>
+        /// <returns>A list of all Exercise.</returns>
+        public PaginationResult<Exercise> GetAllExercisesWithPages(
+            int pageSize = 10,
+            int pageNumber = 0,
+            bool includeSet = false)
+        {
+            var totalItems = _dbContext.Exercises.Count();
+            var items = _mapper.Map<List<Exercise>>(_dbContext.Exercises
+                .Include(e => e.Category)
+                .Include(e => e.Session)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList());
+
+            if (includeSet)
+            {
+                foreach (var exercise in items)
+                {
+                    if (exercise != null)
+                    {
+                        List<Set> sets = _mapper.Map<List<Set>>(_dbContext.Sets
+                        .Where(s => s.ExerciseId == exercise.Id).ToList());
+                        exercise.Sets = sets;
+                    }
+                }
+            }
+
+            return new PaginationResult<Exercise>
+            {
+                Items = items,
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
+        }
+
+        /// <summary>
+        /// Gets all Exercise from category (with pages).
+        /// </summary>
+        /// <returns>A list of all Exercise in category.</returns>
+        public PaginationResult<Exercise> GetExercisesFromCategory(int categoryId, bool includeSet = false)
+        {
+            var items = _mapper.Map<List<Exercise>>(_dbContext.Exercises
+                .Include(e => e.Category)
+                .Include(e => e.Session)
+                .Where(q => q.Category.Id == categoryId)
+                .ToList());
+            var totalItems = items.Count();
+
+            if (includeSet)
+            {
+                foreach (var exercise in items)
+                {
+                    if (exercise != null)
+                    {
+                        List<Set> sets = _mapper.Map<List<Set>>(_dbContext.Sets
+                        .Where(s => s.ExerciseId == exercise.Id).ToList());
+                        exercise.Sets = sets;
+                    }
+                }
+            }
+
+            return new PaginationResult<Exercise>
+            {
+                Items = items,
+                NextPage = -1,
+                TotalItems = totalItems
+            };
         }
 
         /// <summary>
@@ -53,23 +156,17 @@ namespace API.Services
         /// <returns>The exercise with the specified identifier.</returns>
         public Exercise GetExerciseById(int exerciseId)
         {
-            return _dbContext.Exercises.FirstOrDefault(e => e.Id == exerciseId);
-        }
-
-        /// <summary>
-        /// Gets Exercises by category identifier with pagination.
-        /// </summary>
-        /// <param name="categoryId">The identifier of the category.</param>
-        /// <param name="index">The page index (0-based).</param>
-        /// <param name="number">The number of posts per page.</param>
-        /// <returns>The paginated list of exercises with the specified category id.</returns>
-        public List<Exercise> GetExercisesByCategoryId(int categoryId, int index, int number)
-        {
-            return _dbContext.Exercises
-                .Where(e => e.Category.Id == categoryId)
-                .Skip(index * number)
-                .Take(number)
-                .ToList();
+            Exercise exercise = _mapper.Map<Exercise>(_dbContext.Exercises
+                .Include(e => e.Category)
+                .Include(e => e.Session)
+                .FirstOrDefault(e => e.Id == exerciseId));
+            if (exercise != null)
+            {
+                List<Set> sets = _mapper.Map<List<Set>>(_dbContext.Sets
+                .Where(s => s.ExerciseId == exercise.Id).ToList());
+                exercise.Sets = sets;
+            }
+            return exercise;
         }
 
         /// <summary>
@@ -87,7 +184,7 @@ namespace API.Services
                 existingExercise.Description = updatedExercise.Description;
                 existingExercise.Image = updatedExercise.Image;
                 _dbContext.SaveChanges();
-                return existingExercise;
+                return _mapper.Map<Exercise>(existingExercise);
             }
 
             _logger.LogTrace("[LOG | ExerciseService] - (UpdateExercise): Exercise not found");
@@ -107,7 +204,7 @@ namespace API.Services
             {
                 _dbContext.Exercises.Remove(exerciseToDelete);
                 _dbContext.SaveChanges();
-                return exerciseToDelete;
+                return _mapper.Map<Exercise>(exerciseToDelete);
             }
 
             _logger.LogTrace("[LOG | ExerciseService] - (DeleteExercise): Exercise not found");

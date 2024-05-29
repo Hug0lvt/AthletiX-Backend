@@ -1,4 +1,4 @@
-﻿using API.Exceptions;
+﻿using Shared.Exceptions;
 using API.Services;
 using API.Services.Notification;
 using Microsoft.AspNetCore.Mvc;

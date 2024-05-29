@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model;
-using API.Exceptions;
-using API.Repositories;
+using Shared.Exceptions;
+using Shared;
+using AutoMapper;
+using Dommain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services
 {
@@ -13,16 +16,18 @@ namespace API.Services
     {
         private readonly ILogger<SessionService> _logger;
         private readonly IdentityAppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionService"/> class.
         /// </summary>
         /// <param name="dbContext">The database context.</param>
         /// <param name="logger">The logger instance.</param>
-        public SessionService(IdentityAppDbContext dbContext, ILogger<SessionService> logger)
+        public SessionService(IdentityAppDbContext dbContext, ILogger<SessionService> logger, IMapper mapper)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -30,11 +35,29 @@ namespace API.Services
         /// </summary>
         /// <param name="session">The session to be created.</param>
         /// <returns>The created session.</returns>
-        public Session CreateSession(Session session)
+        public async Task<Session> CreateSessionAsync(Session session)
         {
-            _dbContext.Sessions.Add(session);
-            _dbContext.SaveChanges();
-            return session;
+            try
+            {
+                var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.Id == session.Profile.Id);
+                if (existingProfile == null)
+                    throw new NotCreatedExecption("Profile does not exist.");
+
+                var entity = _mapper.Map<SessionEntity>(session);
+
+                entity.ProfileId = existingProfile.Id;
+                entity.Profile = null;
+                _dbContext.Entry(existingProfile).State = EntityState.Unchanged;
+
+                _dbContext.Sessions.Add(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return _mapper.Map<Session>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to create session.", ex);
+            }
         }
 
         /// <summary>
@@ -43,7 +66,76 @@ namespace API.Services
         /// <returns>A list of all sessions.</returns>
         public List<Session> GetAllSessions()
         {
-            return _dbContext.Sessions.ToList();
+            return _mapper.Map<List<Session>>(_dbContext.Sessions.ToList());
+        }
+
+        /// <summary>
+        /// Gets all Session (with pages).
+        /// </summary>
+        /// <returns>A list of all Session.</returns>
+        public PaginationResult<Session> GetAllSessionsWithPages(
+            int pageSize = 10,
+            int pageNumber = 0,
+            bool includeExercise = false)
+        {
+            var totalItems = _dbContext.Sessions.Count();
+            var items = _mapper.Map<List<Session>>(_dbContext.Sessions
+                .Include(s => s.Profile)
+                .Skip(pageNumber * pageSize)
+                .Take(pageSize)
+                .ToList());
+
+            if (includeExercise)
+            {
+                foreach (var session in items)
+                {
+                    if (session != null)
+                    {
+                        List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.Exercises
+                        .Where(e => e.SessionId == session.Id).ToList());
+                        session.Exercises = exercises;
+                    }
+                }
+            }
+
+            return new PaginationResult<Session>
+            {
+                Items = items,
+                NextPage = (pageNumber + 1) * pageSize < totalItems ? pageNumber + 1 : -1,
+                TotalItems = totalItems
+            };
+        }
+
+        /// <summary>
+        /// Gets Session from user id.
+        /// </summary>
+        /// <returns>A list of all Session for one user.</returns>
+        public PaginationResult<Session> GetSessionsFromUser(int id, bool includeExercise = false)
+        {
+            var items = _mapper.Map<List<Session>>(_dbContext.Sessions
+                .Include(s => s.Profile)
+                .Where(q => q.Profile.Id == id).ToList());
+            var totalItems = items.Count();
+
+            if (includeExercise)
+            {
+                foreach (var session in items)
+                {
+                    if (session != null)
+                    {
+                        List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.Exercises
+                        .Where(e => e.SessionId == session.Id).ToList());
+                        session.Exercises = exercises;
+                    }
+                }
+            }
+
+            return new PaginationResult<Session>
+            {
+                Items = items,
+                NextPage = -1,
+                TotalItems = totalItems
+            };
         }
 
         /// <summary>
@@ -53,7 +145,14 @@ namespace API.Services
         /// <returns>The session with the specified identifier.</returns>
         public Session GetSessionById(int sessionId)
         {
-            return _dbContext.Sessions.FirstOrDefault(s => s.Id == sessionId);
+            Session session = _mapper.Map<Session>(_dbContext.Sessions.Include(s => s.Profile).FirstOrDefault(s => s.Id == sessionId));
+            if (session != null)
+            {
+                List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.Exercises
+                .Where(e => e.SessionId == session.Id).ToList());
+                session.Exercises = exercises;
+            }
+            return session;
         }
 
         /// <summary>
@@ -71,7 +170,7 @@ namespace API.Services
                 existingSession.Date = updatedSession.Date;
                 existingSession.Duration = updatedSession.Duration;
                 _dbContext.SaveChanges();
-                return existingSession;
+                return _mapper.Map<Session>(existingSession);
             }
 
             _logger.LogTrace("[LOG | SessionService] - (UpdateSession): Session not found");
@@ -91,7 +190,7 @@ namespace API.Services
             {
                 _dbContext.Sessions.Remove(sessionToDelete);
                 _dbContext.SaveChanges();
-                return sessionToDelete;
+                return _mapper.Map<Session>(sessionToDelete);
             }
 
             _logger.LogTrace("[LOG | SessionService] - (DeleteSession): Session not found");

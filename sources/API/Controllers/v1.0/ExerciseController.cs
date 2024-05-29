@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using API.Services;
 using Model;
-using API.Exceptions;
+using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers.v1_0
@@ -34,10 +34,37 @@ namespace API.Controllers.v1_0
         /// <returns>The newly created exercise.</returns>
         [HttpPost(Name = "POST - Entrypoint for create Exercise")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IActionResult CreateExercise([FromBody] Exercise exercise)
+        public async Task<IActionResult> CreateExercise([FromBody] Exercise exercise)
         {
-            var createdExercise = _exerciseService.CreateExercise(exercise);
+            var createdExercise = await _exerciseService.CreateExerciseAsync(exercise);
             return CreatedAtAction(nameof(GetExerciseById), new { exerciseId = createdExercise.Id }, createdExercise);
+        }
+
+        /// <summary>
+        /// Gets all Exercise with pages.
+        /// </summary>
+        /// <returns>A list of all Exercise.</returns>
+        [HttpGet("pages", Name = "GET - Entrypoint for get all Exercise with pages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllExerciseWithPages(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0,
+            bool includeSet = false)
+        {
+            var exercise = _exerciseService.GetAllExercisesWithPages(pageSize, pageNumber, includeSet);
+            return Ok(exercise);
+        }
+
+        /// <summary>
+        /// Gets all Exercise with pages.
+        /// </summary>
+        /// <returns>A list of all Exercise.</returns>
+        [HttpGet("category/{categoryId}", Name = "GET - Entrypoint for get all Exercise from one category")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetAllExerciseWithPages(int categoryId, bool includeSet = false)
+        {
+            var exercise = _exerciseService.GetExercisesFromCategory(categoryId, includeSet);
+            return Ok(exercise);
         }
 
         /// <summary>
@@ -61,28 +88,6 @@ namespace API.Controllers.v1_0
         }
 
         /// <summary>
-        /// Retrieves a paginated list of exercises by category identifier.
-        /// </summary>
-        /// <param name="categoryId">The identifier of the category.</param>
-        /// <param name="index">The page index (0-based).</param>
-        /// <param name="number">The number of exercises per page.</param>
-        /// <returns>An IActionResult containing the paginated list of exercises with the specified category id.</returns>
-        [HttpGet("{categoryId}/category", Name = "GET - Entrypoint for retrieving exercises by category")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetExerciseByCategory(int categoryId, int index, int number)
-        {
-            var exercise = _exerciseService.GetExercisesByCategoryId(categoryId, index, number);
-
-            if (exercise == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(exercise);
-        }
-
-        /// <summary>
         /// Updates an exercise.
         /// </summary>
         /// <param name="exerciseId">The exercise identifier.</param>
@@ -95,6 +100,7 @@ namespace API.Controllers.v1_0
         {
             try
             {
+                if (updatedExercise.Id != exerciseId) updatedExercise.Id = exerciseId;
                 var exercise = _exerciseService.UpdateExercise(updatedExercise);
                 return Ok(exercise);
             }

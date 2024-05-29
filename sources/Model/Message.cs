@@ -12,6 +12,7 @@ namespace Model
         public string Content { get; set; }
         public DateTime DateSent { get; set; }
         public Profile Sender { get; set; }
+        public int ConversationId { get; set; }
 
     }
 }
