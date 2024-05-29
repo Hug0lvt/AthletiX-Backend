@@ -109,6 +109,7 @@ steps:
         CONTAINERNAME: ath-api
         COMMAND: create
         #OVERWRITE: false
+        CODEFIRST_CLIENTDRONE_ENV_VIDEO_BASE_URI: https://codefirst.iut.uca.fr/containers/AthletiX-ath-api
         CODEFIRST_CLIENTDRONE_ENV_SGBD: PG_SGBD
         CODEFIRST_CLIENTDRONE_ENV_SGBD_HOST: AthletiX-ath-psql-database
         CODEFIRST_CLIENTDRONE_ENV_SGBD_PORT: 5432
