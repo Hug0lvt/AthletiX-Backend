@@ -155,7 +155,7 @@ app.UseSwaggerUI();// NE PAS LAISSER EN PROD
 
 //app.UseHttpsRedirection(); //Casser avec Codefirst
 
-# region Post File System
+#region Post File System
 var physicalPath = Path.Combine(Directory.GetCurrentDirectory(), "athv1", "posts");
 if (!Directory.Exists(physicalPath)) Directory.CreateDirectory(physicalPath);
 app.UseStaticFiles(new StaticFileOptions
