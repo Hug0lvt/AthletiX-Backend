@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Domain.Entities;
 using Profile = Model.Profile;
+using System;
 
 namespace API.Services
 {
@@ -298,6 +299,73 @@ namespace API.Services
             {
                 Items = posts,
                 TotalItems = posts.Count()
+            };
+        }
+
+        public PaginationResult<Post> GetRecommendedPosts(int profileId, int pageSize = 10)
+        {
+            var currentTime = DateTime.Now;
+            var seed = (int)((currentTime.Ticks / TimeSpan.TicksPerMillisecond) % int.MaxValue);
+            var random = new Random(seed);
+
+            // Step 1: Get les posts liké par l'user
+            var likedPosts = _dbContext.LikedPosts
+                .Where(lp => lp.LikedByThisProfileId == profileId)
+                .OrderByDescending(lp => lp.Id) // Tri par les derniers likés sur l'id qui en cas de like et unlike changera toujours
+                .Take(5) // On prend les 5 derniers (testé les valeurs qui marchent le mieux)
+                .Select(lp => lp.LikedPost)
+                .ToList();
+
+            // Step 2: Get les category des posts likées
+            var likedCategories = likedPosts
+                .Select(lp => lp.CategoryId)
+                .Distinct()
+                .ToList();
+
+            // Step 3: Trouver les posts avec une category similaire
+            var recommendedPosts = _dbContext.Posts
+                .Include(p => p.Publisher)
+                .Include(p => p.Category)
+                .Where(p => likedCategories.Contains(p.CategoryId) && !likedPosts.Contains(p))
+                .Take(pageSize-1)
+                .ToList();
+
+            // Step 4: Ajout d'un post alétoire pour proposer de nouvelles catégories
+            var randomPost = _dbContext.Posts
+                .Include(p => p.Publisher)
+                .Include(p => p.Category)
+                .Where(p => !likedPosts.Contains(p) && !recommendedPosts.Contains(p))
+                //.OrderBy(p => random.Next()) // TODO Fix Random
+                .FirstOrDefault();
+
+            if (randomPost != null)
+            {
+                recommendedPosts.Add(randomPost);
+            }
+
+            // Step 5: Si on a pas le nombre de post nécéssaires, on complète avec de l'aléatoire
+            if (recommendedPosts.Count < pageSize)
+            {
+                var additionalRandomPosts = _dbContext.Posts
+                    .Include(p => p.Publisher)
+                    .Include(p => p.Category)
+                    .Where(p => !likedPosts.Contains(p) && !recommendedPosts.Contains(p))
+                    //.OrderBy(p => random.Next()) // TODO Fix Random
+                    .Take(pageSize - recommendedPosts.Count)
+                    .ToList();
+
+                if (additionalRandomPosts.Any()) recommendedPosts.AddRange(additionalRandomPosts);
+            }
+
+            // Step 6: Tri aléatoire des posts
+            recommendedPosts = recommendedPosts
+                //.OrderBy(p => random.Next()) // TODO Fix Random
+                .ToList();
+
+            return new PaginationResult<Post>
+            {
+                Items = _mapper.Map<List<Post>>(recommendedPosts),
+                TotalItems = recommendedPosts.Count()
             };
         }
     }

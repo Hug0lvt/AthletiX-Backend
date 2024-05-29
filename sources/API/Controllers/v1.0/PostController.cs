@@ -230,5 +230,16 @@ namespace API.Controllers.v1_0
 
             return Ok(_postService.UpdatePost(postId, existingPost));
         }
+
+        /// <summary>
+        /// Retrieves a paginated list of posts recomended for user.
+        /// </summary>
+        [HttpGet("recommendations/user/{userId}", Name = "GET - Entrypoint for retrieving recommended posts by user")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult GetRecommendationsPostByUser(int userId, int pageSize = 10)
+        {
+            return Ok(_postService.GetRecommendedPosts(userId, pageSize));
+        }
     }
 }
