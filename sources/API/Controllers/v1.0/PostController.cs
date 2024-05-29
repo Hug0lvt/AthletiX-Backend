@@ -18,6 +18,7 @@ namespace API.Controllers.v1_0
     {
         private readonly PostService _postService;
         private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "athv1", "posts");
+        string videoBaseUri = Environment.GetEnvironmentVariable("VIDEO_BASE_URI", EnvironmentVariableTarget.Process) ?? "";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PostController"/> class.
@@ -222,7 +223,7 @@ namespace API.Controllers.v1_0
                 await file.CopyToAsync(stream);
             }
 
-            var fileUrl = $"{Request.Scheme}://{Request.Host}/videos/{newFileName}"; // TODO A test sur codefirst
+            var fileUrl = $"{videoBaseUri}/videos/{newFileName}"; // TODO A test sur codefirst
 
             existingPost.Content = fileUrl;
             if (_postService.IsVideoExtension(extension)) existingPost.PublicationType = Shared.Enums.PublicationType.Video;
