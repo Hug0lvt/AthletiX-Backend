@@ -31,19 +31,19 @@ namespace API.Services
         /// </summary>
         /// <param name="practicalExercise">The PracticalExercise to be created.</param>
         /// <returns>The created exercise.</returns>
-        public async Task<PracticalExercise> CreatePracticalExerciseAsync(PracticalExercise practicalExercise)
+        public async Task<PracticalExercise> CreatePracticalExerciseAsync(int sessionId, int exerciseId)
         {
             try
             {
-                var existingExercise = await _dbContext.Exercises.FirstOrDefaultAsync(c => c.Id == practicalExercise.Exercise.Id);
+                var existingExercise = await _dbContext.Exercises.FirstOrDefaultAsync(c => c.Id == exerciseId);
                 if (existingExercise == null)
                     throw new NotCreatedExecption("Exercise does not exist.");
 
-                var existingSession = await _dbContext.Sessions.FirstOrDefaultAsync(s => s.Id == practicalExercise.Session.Id);
+                var existingSession = await _dbContext.Sessions.FirstOrDefaultAsync(s => s.Id == sessionId);
                 if (existingSession == null)
                     throw new NotCreatedExecption("Session does not exist.");
 
-                var entity = _mapper.Map<PracticalExerciseEntity>(practicalExercise);
+                var entity = new PracticalExerciseEntity { Id = 0, ExerciseId = exerciseId, SessionId = sessionId };
 
                 entity.ExerciseId = existingExercise.Id;
                 entity.SessionId = existingSession.Id;
