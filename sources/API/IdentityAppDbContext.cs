@@ -19,6 +19,7 @@ namespace API
         public DbSet<ProfileEntity> Profiles { get; set; }
         public DbSet<SessionEntity> Sessions { get; set; }
         public DbSet<SetEntity> Sets { get; set; }
+        public DbSet<PracticalExerciseEntity> PracticalExercises { get; set; }
 
         public IdentityAppDbContext(DbContextOptions<IdentityAppDbContext> options) : base(options)
         {

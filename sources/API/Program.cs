@@ -65,6 +65,7 @@ builder.Services.AddAutoMapper(typeof(PostMapper));
 builder.Services.AddAutoMapper(typeof(ProfileMapper));
 builder.Services.AddAutoMapper(typeof(SessionMapper));
 builder.Services.AddAutoMapper(typeof(SetMapper));
+builder.Services.AddAutoMapper(typeof(PracticalExerciseMapper));
 #endregion
 
 #region Dependency Injection
@@ -77,6 +78,7 @@ builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<SessionService>();
 builder.Services.AddScoped<SetService>();
+builder.Services.AddScoped<PracticalExerciseService>();
 #endregion
 
 #region Firebase Tools

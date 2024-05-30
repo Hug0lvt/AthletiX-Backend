@@ -206,6 +206,28 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Exercises",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CategoryId = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Image = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Exercises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Exercises_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ConversationMembers",
                 columns: table => new
                 {
@@ -372,28 +394,25 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Exercises",
+                name: "PracticalExercises",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    SessionId = table.Column<int>(type: "integer", nullable: false),
-                    CategoryId = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    Image = table.Column<string>(type: "text", nullable: false)
+                    ExerciseId = table.Column<int>(type: "integer", nullable: false),
+                    SessionId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Exercises", x => x.Id);
+                    table.PrimaryKey("PK_PracticalExercises", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Exercises_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
+                        name: "FK_PracticalExercises_Exercises_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercises",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Exercises_Sessions_SessionId",
+                        name: "FK_PracticalExercises_Sessions_SessionId",
                         column: x => x.SessionId,
                         principalTable: "Sessions",
                         principalColumn: "Id",
@@ -416,9 +435,9 @@ namespace API.Migrations
                 {
                     table.PrimaryKey("PK_Sets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Sets_Exercises_ExerciseId",
+                        name: "FK_Sets_PracticalExercises_ExerciseId",
                         column: x => x.ExerciseId,
-                        principalTable: "Exercises",
+                        principalTable: "PracticalExercises",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -498,11 +517,6 @@ namespace API.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Exercises_SessionId",
-                table: "Exercises",
-                column: "SessionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_LikedPosts_LikedByThisProfileId_LikedPostId",
                 table: "LikedPosts",
                 columns: new[] { "LikedByThisProfileId", "LikedPostId" },
@@ -532,6 +546,16 @@ namespace API.Migrations
                 name: "IX_Posts_ProfileId",
                 table: "Posts",
                 column: "ProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PracticalExercises_ExerciseId",
+                table: "PracticalExercises",
+                column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PracticalExercises_SessionId",
+                table: "PracticalExercises",
+                column: "SessionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Profiles_Email",
@@ -596,13 +620,16 @@ namespace API.Migrations
                 name: "Conversations");
 
             migrationBuilder.DropTable(
+                name: "PracticalExercises");
+
+            migrationBuilder.DropTable(
                 name: "Exercises");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Sessions");
 
             migrationBuilder.DropTable(
-                name: "Sessions");
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Profiles");

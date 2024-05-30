@@ -1,4 +1,5 @@
-﻿using Shared.Enums;
+﻿using Domain.Entities;
+using Shared.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,7 +18,7 @@ namespace Dommain.Entities
 
         public int ExerciseId { get; set; }
         [ForeignKey(nameof(ExerciseId))]
-        public virtual ExerciseEntity Exercise { get; set; }
+        public virtual PracticalExerciseEntity Exercise { get; set; }
 
         public int Reps { get; set; }
         

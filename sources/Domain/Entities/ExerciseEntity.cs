@@ -13,10 +13,6 @@ namespace Dommain.Entities
         [Key]
         public int Id { get; set; }
 
-        public int SessionId { get; set; }
-        [ForeignKey(nameof(SessionId))]
-        public virtual SessionEntity Session { get; set; }
-
         public int CategoryId { get; set; }
         [ForeignKey(nameof(CategoryId))]
         public virtual CategoryEntity Category { get; set; }
