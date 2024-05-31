@@ -110,6 +110,29 @@ namespace API.Migrations
                     b.ToTable("LikedPosts");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PracticalExerciseEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ExerciseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SessionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
+
+                    b.HasIndex("SessionId");
+
+                    b.ToTable("PracticalExercises");
+                });
+
             modelBuilder.Entity("Dommain.Entities.CategoryEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -235,14 +258,9 @@ namespace API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("SessionId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("SessionId");
 
                     b.ToTable("Exercises");
                 });
@@ -575,6 +593,25 @@ namespace API.Migrations
                     b.Navigation("LikedPost");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PracticalExerciseEntity", b =>
+                {
+                    b.HasOne("Dommain.Entities.ExerciseEntity", "Exercise")
+                        .WithMany()
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dommain.Entities.SessionEntity", "Session")
+                        .WithMany()
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercise");
+
+                    b.Navigation("Session");
+                });
+
             modelBuilder.Entity("Dommain.Entities.CommentEntity", b =>
                 {
                     b.HasOne("Dommain.Entities.CommentEntity", "ParentComment")
@@ -627,15 +664,7 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dommain.Entities.SessionEntity", "Session")
-                        .WithMany()
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("Session");
                 });
 
             modelBuilder.Entity("Dommain.Entities.MessageEntity", b =>
@@ -689,7 +718,7 @@ namespace API.Migrations
 
             modelBuilder.Entity("Dommain.Entities.SetEntity", b =>
                 {
-                    b.HasOne("Dommain.Entities.ExerciseEntity", "Exercise")
+                    b.HasOne("Domain.Entities.PracticalExerciseEntity", "Exercise")
                         .WithMany()
                         .HasForeignKey("ExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)

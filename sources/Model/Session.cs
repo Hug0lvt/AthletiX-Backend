@@ -13,7 +13,7 @@ namespace Model
         public string Name { get; set; }
         public DateTime Date { get; set; }
         public TimeSpan Duration { get; set; }
-        public List<Exercise> Exercises { get; set; } = new List<Exercise>();
+        public List<PracticalExercise> Exercises { get; set; } = new List<PracticalExercise>();
 
     }
 }

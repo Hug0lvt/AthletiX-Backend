@@ -39,7 +39,7 @@ namespace API.Services
         {
             try
             {
-                var existingExercise = await _dbContext.Exercises.FirstOrDefaultAsync(p => p.Id == set.Exercise.Id);
+                var existingExercise = await _dbContext.PracticalExercises.FirstOrDefaultAsync(p => p.Id == set.Exercise.Id);
                 if (existingExercise == null)
                     throw new NotCreatedExecption("Exercise does not exist.");
 
