@@ -129,5 +129,21 @@ namespace API.Controllers.v1_0
                 return NotFound(ex.Message);
             }
         }
+
+        [HttpPatch("{setId}/done", Name = "PUT - Entrypoint for done a Set")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult UpdateIsDoneSet(int setId, bool isDone)
+        {
+            try
+            {
+                var set = _setService.UpdateIsDoneSet(setId, isDone);
+                return Ok(set);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

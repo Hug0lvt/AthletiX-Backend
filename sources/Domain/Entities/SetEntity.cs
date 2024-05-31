@@ -34,6 +34,7 @@ namespace Dommain.Entities
 
         public TimeSpan Rest { get; set; }
         public SetMode Mode { get; set; }
+        public bool IsDone { get; set; }
 
     }
 }

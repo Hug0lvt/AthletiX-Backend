@@ -238,9 +238,9 @@ namespace API.Controllers.v1_0
         [HttpGet("recommendations/user/{userId}", Name = "GET - Entrypoint for retrieving recommended posts by user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetRecommendationsPostByUser(int userId, int pageSize = 10)
+        public IActionResult GetRecommendationsPostByUser(int userId, int pageSize = 10, bool includeComments = true)
         {
-            return Ok(_postService.GetRecommendedPosts(userId, pageSize));
+            return Ok(_postService.GetRecommendedPosts(userId, pageSize, includeComments));
         }
     }
 }

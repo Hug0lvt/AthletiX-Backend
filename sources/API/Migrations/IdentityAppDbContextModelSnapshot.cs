@@ -422,6 +422,9 @@ namespace API.Migrations
                     b.Property<int>("ExerciseId")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("Mode")
                         .HasColumnType("integer");
 

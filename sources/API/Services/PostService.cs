@@ -302,7 +302,7 @@ namespace API.Services
             };
         }
 
-        public PaginationResult<Post> GetRecommendedPosts(int profileId, int pageSize = 10)
+        public PaginationResult<Post> GetRecommendedPosts(int profileId, int pageSize = 10, bool includeComments = true)
         {
             var currentTime = DateTime.Now;
             var seed = (int)((currentTime.Ticks / TimeSpan.TicksPerMillisecond) % int.MaxValue);
@@ -362,10 +362,25 @@ namespace API.Services
                 //.OrderBy(p => random.Next()) // TODO Fix Random
                 .ToList();
 
+            var returnedPosts = _mapper.Map<List<Post>>(recommendedPosts);
+
+            if (includeComments)
+            {
+                foreach (var post in returnedPosts)
+                {
+                    if (post != null)
+                    {
+                        List<Comment> comments = _mapper.Map<List<Comment>>(_dbContext.Comments
+                        .Where(c => c.PostId == post.Id).ToList());
+                        post.Comments = comments;
+                    }
+                }
+            }
+
             return new PaginationResult<Post>
             {
-                Items = _mapper.Map<List<Post>>(recommendedPosts),
-                TotalItems = recommendedPosts.Count()
+                Items = returnedPosts,
+                TotalItems = returnedPosts.Count()
             };
         }
     }

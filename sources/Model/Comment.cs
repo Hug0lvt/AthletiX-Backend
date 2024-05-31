@@ -9,7 +9,7 @@ namespace Model
     public class Comment
     {
         public int Id { get; set; }
-        public int? ParentCommentId { get; set; } = null;
+        public int? ParentCommentId { get; set; }
         public DateTime PublishDate { get; set; }
         public Profile Publisher { get; set; }
         public Post Post { get; set; }
