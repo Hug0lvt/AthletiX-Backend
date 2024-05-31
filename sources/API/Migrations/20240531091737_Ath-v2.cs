@@ -429,7 +429,8 @@ namespace API.Migrations
                     Reps = table.Column<int>(type: "integer", nullable: false),
                     WeightJson = table.Column<string>(type: "text", nullable: false),
                     Rest = table.Column<TimeSpan>(type: "interval", nullable: false),
-                    Mode = table.Column<int>(type: "integer", nullable: false)
+                    Mode = table.Column<int>(type: "integer", nullable: false),
+                    IsDone = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
