@@ -15,6 +15,7 @@ namespace Model
         public TimeSpan Rest { get; set; }
         public SetMode Mode { get; set; }
         public PracticalExercise Exercise { get; set; }
+        public bool IsDone { get; set; }
 
     }
 }

@@ -119,6 +119,7 @@ namespace API.Services
                 existingSet.Weight = updatedSet.Weight;
                 existingSet.Rest = updatedSet.Rest;
                 existingSet.Mode = updatedSet.Mode;
+                existingSet.IsDone = updatedSet.IsDone;
                 _dbContext.SaveChanges();
                 return _mapper.Map<Set>(existingSet);
             }
@@ -145,6 +146,24 @@ namespace API.Services
 
             _logger.LogTrace("[LOG | SetService] - (DeleteSet): Set not found");
             throw new NotFoundException("[LOG | SetService] - (DeleteSet): Set not found");
+        }
+
+        /// <summary>
+        /// Updates status of done for an existing set.
+        /// </summary>
+        public Set UpdateIsDoneSet(int setId, bool isDone)
+        {
+            var existingSet = _dbContext.Sets.Find(setId);
+
+            if (existingSet != null)
+            {
+                existingSet.IsDone = isDone;
+                _dbContext.SaveChanges();
+                return _mapper.Map<Set>(existingSet);
+            }
+
+            _logger.LogTrace("[LOG | SetService] - (UpdateSet): Set not found");
+            throw new NotFoundException("[LOG | SetService] - (UpdateSet): Set not found");
         }
     }
 }
