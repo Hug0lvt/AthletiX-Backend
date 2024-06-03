@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(IdentityAppDbContext))]
-    [Migration("20240531091737_Ath-v2")]
+    [Migration("20240603093244_Ath-v2")]
     partial class Athv2
     {
         /// <inheritdoc />

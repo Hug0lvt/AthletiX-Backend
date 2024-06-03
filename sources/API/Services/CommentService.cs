@@ -41,6 +41,10 @@ namespace API.Services
         {
             try
             {
+                var existingParentComment = await _dbContext.Comments.FirstOrDefaultAsync(p => p.ParentCommentId == comment.Id);
+                if (existingParentComment == null)
+                    comment.ParentCommentId = null;
+
                 var existingPost = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == comment.Post.Id);
                 if (existingPost == null)
                     throw new NotCreatedExecption("Post does not exist.");
@@ -53,11 +57,24 @@ namespace API.Services
 
                 entity.PostId = existingPost.Id;
                 entity.ProfileId = existingProfile.Id;
+                if(existingParentComment != null)
+                {
+                    entity.ParentCommentId = existingParentComment.Id;
+                    entity.ParentComment = null;
+                    _dbContext.Entry(existingParentComment).State = EntityState.Unchanged;
+                } else
+                {
+                    entity.ParentCommentId = null;
+                    entity.ParentComment = null;
+                }
+                    
                 entity.Publisher = null;
                 entity.Post = null;
+                
 
                 _dbContext.Entry(existingPost).State = EntityState.Unchanged;
                 _dbContext.Entry(existingProfile).State = EntityState.Unchanged;
+                
 
                 _dbContext.Comments.Add(entity);
                 await _dbContext.SaveChangesAsync();
