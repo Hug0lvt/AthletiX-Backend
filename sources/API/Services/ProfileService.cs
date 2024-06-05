@@ -90,9 +90,11 @@ namespace API.Services
                 existingProfile.Username = updatedProfile.Username;
                 existingProfile.Role = updatedProfile.Role;
                 existingProfile.Age = updatedProfile.Age;
-                existingProfile.Email = updatedProfile.Email;
+                //existingProfile.Email = updatedProfile.Email;
                 existingProfile.Weight = updatedProfile.Weight;
                 existingProfile.Height = updatedProfile.Height;
+                existingProfile.Picture = updatedProfile.Picture;
+                existingProfile.Gender = updatedProfile.Gender;
                 _dbContext.SaveChanges();
                 return _mapper.Map<Profile>(existingProfile);
             }
