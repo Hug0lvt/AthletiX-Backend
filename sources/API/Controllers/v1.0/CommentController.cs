@@ -40,7 +40,7 @@ namespace API.Controllers.v1_0
             Debug.WriteLine(comment.ToString());
             Console.WriteLine(comment.ToString());
             var createdComment = await _commentService.CreateCommentAsync(comment);
-            return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.Id }, createdComment);
+            return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.Id }, _commentService.GetCommentById(createdComment.Id));
         }
 
         /// <summary>
