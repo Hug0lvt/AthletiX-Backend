@@ -49,7 +49,7 @@ namespace API.Services
                 if (existingParentComment == null)
                     comment.ParentCommentId = null;
 
-                var existingPost = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == comment.Post.Id);
+                var existingPost = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == comment.PostId);
                 if (existingPost == null)
                     throw new NotCreatedExecption("Post does not exist.");
 
