@@ -111,8 +111,11 @@ namespace API.Services
                 List<Comment> comments = _mapper.Map<List<Comment>>(_dbContext.Comments
                 .Where(c => c.PostId == post.Id).ToList());
                 post.Comments = comments;
+                
+                List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.ExerciseInPost
+                    .Where(p => p.PostId == post.Id).ToList());
+                post.Exercises = exercises;
             }
-
             return post;
         }
 
@@ -121,7 +124,7 @@ namespace API.Services
         /// </summary>
         /// <param name="categoryId">The identifier of the category.</param>
         /// <returns>The paginated list of posts with the specified category id.</returns>
-        public PaginationResult<Post> GetPostsByCategory(int categoryId, bool includeComments = false)
+        public PaginationResult<Post> GetPostsByCategory(int categoryId, bool includeComments = false, bool includeExercises = false)
         {
             var items = _mapper.Map<List<Post>>(_dbContext.Posts.Include(p => p.Category).Include(p => p.Publisher)
                 .Where(p => p.Category.Id == categoryId)
@@ -136,6 +139,21 @@ namespace API.Services
                         List<Comment> comments = _mapper.Map<List<Comment>>(_dbContext.Comments
                         .Where(c => c.PostId == post.Id).ToList());
                         post.Comments = comments;
+                    }
+                }
+            }
+            
+            if (includeExercises)
+            {
+                foreach (var post in items)
+                {
+                    if (post != null)
+                    {
+                        List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.ExerciseInPost
+                            .Include(e => e.Exercise)
+                            .Where(p => p.PostId == post.Id)
+                            .Select(e => e.Exercise).ToList());
+                        post.Exercises = exercises;
                     }
                 }
             }
@@ -154,7 +172,7 @@ namespace API.Services
         /// </summary>
         /// <param name="categoryId">The identifier of the user.</param>
         /// <returns>The list of posts with the specified user id.</returns>
-        public PaginationResult<Post> GetPostsByUser(int userId, bool includeComments = false)
+        public PaginationResult<Post> GetPostsByUser(int userId, bool includeComments = false, bool includeExercises = false)
         {
             var items = _mapper.Map<List<Post>>(_dbContext.Posts.Include(p => p.Category).Include(p => p.Publisher)
                 .Where(p => p.Publisher.Id == userId)
@@ -169,6 +187,21 @@ namespace API.Services
                         List<Comment> comments = _mapper.Map<List<Comment>>(_dbContext.Comments
                         .Where(c => c.PostId == post.Id).ToList());
                         post.Comments = comments;
+                    }
+                }
+            }
+            
+            if (includeExercises)
+            {
+                foreach (var post in items)
+                {
+                    if (post != null)
+                    {
+                        List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.ExerciseInPost
+                            .Include(e => e.Exercise)
+                            .Where(p => p.PostId == post.Id)
+                            .Select(e => e.Exercise).ToList());
+                        post.Exercises = exercises;
                     }
                 }
             }
@@ -302,7 +335,7 @@ namespace API.Services
             };
         }
 
-        public PaginationResult<Post> GetRecommendedPosts(int profileId, int pageSize = 10, bool includeComments = true)
+        public PaginationResult<Post> GetRecommendedPosts(int profileId, int pageSize = 10, bool includeComments = true, bool includeExercises = false)
         {
             var currentTime = DateTime.Now;
             var seed = (int)((currentTime.Ticks / TimeSpan.TicksPerMillisecond) % int.MaxValue);
@@ -376,12 +409,69 @@ namespace API.Services
                     }
                 }
             }
+            
+            if (includeExercises)
+            {
+                foreach (var post in returnedPosts)
+                {
+                    if (post != null)
+                    {
+                        List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.ExerciseInPost
+                            .Include(e => e.Exercise)
+                            .Where(p => p.PostId == post.Id)
+                            .Select(e => e.Exercise).ToList());
+                        post.Exercises = exercises;
+                    }
+                }
+            }
 
             return new PaginationResult<Post>
             {
                 Items = returnedPosts,
                 TotalItems = returnedPosts.Count()
             };
+        }
+        
+        /// <summary>
+        /// Add a exersise on post.
+        /// </summary>
+        public async Task<bool> AddExerciseToPost(int postId, int exerciseId)
+        {
+            var existingPost = await _dbContext.Posts.FirstOrDefaultAsync(c => c.Id == postId);
+            if (existingPost == null)
+                throw new NotCreatedExecption("Post does not exist.");
+
+            var existingExercise = await _dbContext.Exercises.FirstOrDefaultAsync(p => p.Id == exerciseId);
+            if (existingExercise == null)
+                throw new NotCreatedExecption("Exercise does not exist.");
+
+            _dbContext.ExerciseInPost.Add(new ExerciseInPostEntity
+                { Id = 0, ExerciseId = exerciseId, PostId = postId });
+            _dbContext.SaveChanges();
+            return true;
+        }
+        
+        /// <summary>
+        /// Remove a exersise on a post.
+        /// </summary>
+        public async Task<bool> RemoveExerciseToPost(int postId, int exerciseId)
+        {
+            var existingPost = await _dbContext.Posts.FirstOrDefaultAsync(c => c.Id == postId);
+            if (existingPost == null)
+                throw new NotCreatedExecption("Post does not exist.");
+
+            var existingExercise = await _dbContext.Exercises.FirstOrDefaultAsync(p => p.Id == exerciseId);
+            if (existingExercise == null)
+                throw new NotCreatedExecption("Exercise does not exist.");
+
+            var existingExerciseInPost = await _dbContext.ExerciseInPost
+                .FirstOrDefaultAsync(e => e.PostId == postId && e.ExerciseId == exerciseId);
+            if (existingExerciseInPost == null)
+                throw new NotFoundException("Profile not contains this exercise.");
+
+            _dbContext.ExerciseInPost.Remove(existingExerciseInPost);
+            _dbContext.SaveChanges();
+            return true;
         }
     }
 }

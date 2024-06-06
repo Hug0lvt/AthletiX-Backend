@@ -18,6 +18,7 @@ namespace Model
         public PublicationType PublicationType { get; set; }
         public string Content { get; set; }
         public List<Comment> Comments { get; set; } = new List<Comment>();
+        public List<Exercise> Exercises { get; set; } = new List<Exercise>();
 
         public override string ToString()
         {
@@ -25,8 +26,9 @@ namespace Model
             string categoryName = Category != null ? Category.ToString() : "Uncategorized";
             string publicationTypeName = PublicationType != null ? PublicationType.ToString() : "Unknown";
             string commentsCount = Comments != null ? Comments.Count.ToString() : "0";
+            string exercisesCount = Exercises != null ? Exercises.Count.ToString() : "0";
         
-            return $"Post Id: {Id}, Publisher: {publisherName}, Category: {categoryName}, Title: \"{Title}\", Description: \"{Description}\", Publication Type: {publicationTypeName}, Content: \"{Content}\", Comments Count: {commentsCount}";
+            return $"Post Id: {Id}, Publisher: {publisherName}, Category: {categoryName}, Title: \"{Title}\", Description: \"{Description}\", Publication Type: {publicationTypeName}, Content: \"{Content}\", Comments Count: {commentsCount}, Exercises Count: {exercisesCount}";
         }
     }
 }
