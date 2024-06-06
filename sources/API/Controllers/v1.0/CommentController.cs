@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using API.Services;
 using Model;
 using Shared.Exceptions;
@@ -36,8 +37,10 @@ namespace API.Controllers.v1_0
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateComment([FromBody] Comment comment)
         {
+            Debug.WriteLine(comment.ToString());
+            Console.WriteLine(comment.ToString());
             var createdComment = await _commentService.CreateCommentAsync(comment);
-            return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.Id }, createdComment);
+            return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.Id }, _commentService.GetCommentById(createdComment.Id));
         }
 
         /// <summary>

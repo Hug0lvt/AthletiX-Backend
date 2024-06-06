@@ -35,28 +35,36 @@ namespace API.Services
         {
             try
             {
-                var existingExercise = await _dbContext.Exercises.FirstOrDefaultAsync(c => c.Id == exerciseId);
+                var existingExercise = await _dbContext.Exercises
+                    .Include(e => e.Category)
+                    .FirstOrDefaultAsync(c => c.Id == exerciseId);
+        
                 if (existingExercise == null)
                     throw new NotCreatedExecption("Exercise does not exist.");
 
-                var existingSession = await _dbContext.Sessions.FirstOrDefaultAsync(s => s.Id == sessionId);
+                var existingSession = await _dbContext.Sessions
+                    .Include(s => s.Profile)
+                    .FirstOrDefaultAsync(s => s.Id == sessionId);
                 if (existingSession == null)
                     throw new NotCreatedExecption("Session does not exist.");
 
-                var entity = new PracticalExerciseEntity { Id = 0, ExerciseId = exerciseId, SessionId = sessionId };
-
-                entity.ExerciseId = existingExercise.Id;
-                entity.SessionId = existingSession.Id;
-                entity.Session = null;
-                entity.Exercise = null;
-
-                _dbContext.Entry(existingExercise).State = EntityState.Unchanged;
-                _dbContext.Entry(existingSession).State = EntityState.Unchanged;
+                var entity = new PracticalExerciseEntity
+                {
+                    Id = 0,
+                    ExerciseId = exerciseId,
+                    SessionId = sessionId,
+                    Exercise = existingExercise,
+                    Session = existingSession
+                };
 
                 _dbContext.PracticalExercises.Add(entity);
                 await _dbContext.SaveChangesAsync();
-
-                return _mapper.Map<PracticalExercise>(entity);
+        
+                var result = _mapper.Map<PracticalExercise>(entity);
+                result.Exercise.Category = _mapper.Map<Category>(existingExercise.Category);
+                result.Session.Profile = _mapper.Map<Model.Profile>(existingSession.Profile);
+                result.Sets = new List<Set>();
+                return result;
             }
             catch (Exception ex)
             {

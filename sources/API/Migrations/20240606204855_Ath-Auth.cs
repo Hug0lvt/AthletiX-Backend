@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class Athv2 : Migration
+    public partial class AthAuth : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -368,6 +368,32 @@ namespace API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExerciseInPost",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ExerciseId = table.Column<int>(type: "integer", nullable: false),
+                    PostId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExerciseInPost", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExerciseInPost_Exercises_ExerciseId",
+                        column: x => x.ExerciseId,
+                        principalTable: "Exercises",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExerciseInPost_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LikedPosts",
                 columns: table => new
                 {
@@ -513,6 +539,17 @@ namespace API.Migrations
                 column: "ProfileId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExerciseInPost_ExerciseId_PostId",
+                table: "ExerciseInPost",
+                columns: new[] { "ExerciseId", "PostId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExerciseInPost_PostId",
+                table: "ExerciseInPost",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Exercises_CategoryId",
                 table: "Exercises",
                 column: "CategoryId");
@@ -598,6 +635,9 @@ namespace API.Migrations
 
             migrationBuilder.DropTable(
                 name: "ConversationMembers");
+
+            migrationBuilder.DropTable(
+                name: "ExerciseInPost");
 
             migrationBuilder.DropTable(
                 name: "LikedPosts");

@@ -20,6 +20,7 @@ namespace API
         public DbSet<SessionEntity> Sessions { get; set; }
         public DbSet<SetEntity> Sets { get; set; }
         public DbSet<PracticalExerciseEntity> PracticalExercises { get; set; }
+        public DbSet<ExerciseInPostEntity> ExerciseInPost { get; set; }
 
         public IdentityAppDbContext(DbContextOptions<IdentityAppDbContext> options) : base(options)
         {
@@ -33,12 +34,16 @@ namespace API
             modelBuilder.Entity<ProfileEntity>().HasIndex(u => u.Email).IsUnique();
 
             modelBuilder.Entity<LikedPostEntity>()
-            .HasIndex(l => new { l.LikedByThisProfileId, l.LikedPostId })
-            .IsUnique();
+                .HasIndex(l => new { l.LikedByThisProfileId, l.LikedPostId })
+                .IsUnique();
 
             modelBuilder.Entity<ConversationMembersEntity>()
-            .HasIndex(c => new { c.ConversationId, c.ProfileId })
-            .IsUnique();
+                .HasIndex(c => new { c.ConversationId, c.ProfileId })
+                .IsUnique();
+            
+            modelBuilder.Entity<ExerciseInPostEntity>()
+                .HasIndex(p => new { p.ExerciseId, p.PostId })
+                .IsUnique();
             // TODO A COMPLETER
         }
     }

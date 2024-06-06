@@ -70,9 +70,9 @@ namespace API.Controllers.v1_0
         [HttpGet("category/{categoryId}", Name = "GET - Entrypoint for retrieving posts by category")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetPostByCategory(int categoryId, bool includeComments = false)
+        public IActionResult GetPostByCategory(int categoryId, bool includeComments = false, bool includeExercises = false)
         {
-            var post = _postService.GetPostsByCategory(categoryId, includeComments);
+            var post = _postService.GetPostsByCategory(categoryId, includeComments, includeExercises);
 
             if (post == null)
             {
@@ -90,9 +90,9 @@ namespace API.Controllers.v1_0
         [HttpGet("user/{userId}", Name = "GET - Entrypoint for retrieving posts by user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetPostByUser(int userId, bool includeComments = false)
+        public IActionResult GetPostByUser(int userId, bool includeComments = false, bool includeExercises = false)
         {
-            var post = _postService.GetPostsByUser(userId, includeComments);
+            var post = _postService.GetPostsByUser(userId, includeComments, includeExercises);
 
             if (post == null)
             {
@@ -238,9 +238,45 @@ namespace API.Controllers.v1_0
         [HttpGet("recommendations/user/{userId}", Name = "GET - Entrypoint for retrieving recommended posts by user")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetRecommendationsPostByUser(int userId, int pageSize = 10, bool includeComments = true)
+        public IActionResult GetRecommendationsPostByUser(int userId, int pageSize = 10, bool includeComments = true, bool includeExercises = true)
         {
-            return Ok(_postService.GetRecommendedPosts(userId, pageSize, includeComments));
+            return Ok(_postService.GetRecommendedPosts(userId, pageSize, includeComments, includeExercises));
+        }
+        
+        /// <summary>
+        /// Add a exersise to a post.
+        /// </summary>
+        [HttpPost("{postId}/addExercise/{exerciseId}", Name = "POST - Entrypoint for add exercise to a post")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AddExerciseToPost(int postId, int exerciseId)
+        {
+            try
+            {
+                return Ok(await _postService.AddExerciseToPost(postId, exerciseId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        
+        /// <summary>
+        /// Unlike post with profile.
+        /// </summary>
+        [HttpDelete("{postId}/removeExercise/{exerciseId}", Name = "POST - Entrypoint for remove exercise to a post")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RemoveExerciseToPost(int postId, int exerciseId)
+        {
+            try
+            {
+                return Ok(await _postService.RemoveExerciseToPost(postId, exerciseId));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }
