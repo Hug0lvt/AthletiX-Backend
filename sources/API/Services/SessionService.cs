@@ -92,7 +92,8 @@ namespace API.Services
                     if (session != null)
                     {
                         List<PracticalExercise> exercises = _mapper.Map<List<PracticalExercise>>(_dbContext.PracticalExercises
-                        .Where(e => e.SessionId == session.Id).ToList());
+                            .Include(p=> p.Exercise)
+                            .Where(e => e.SessionId == session.Id).ToList());
                         session.Exercises = exercises;
                     }
                 }
@@ -124,7 +125,8 @@ namespace API.Services
                     if (session != null)
                     {
                         List<PracticalExercise> exercises = _mapper.Map<List<PracticalExercise>>(_dbContext.PracticalExercises
-                        .Where(e => e.SessionId == session.Id).ToList());
+                            .Include(p=> p.Exercise)
+                            .Where(e => e.SessionId == session.Id).ToList());
                         session.Exercises = exercises;
                     }
                 }
@@ -149,7 +151,8 @@ namespace API.Services
             if (session != null)
             {
                 List<PracticalExercise> exercises = _mapper.Map<List<PracticalExercise>>(_dbContext.PracticalExercises
-                .Where(e => e.SessionId == session.Id).ToList());
+                    .Include(p=> p.Exercise)
+                    .Where(e => e.SessionId == session.Id).ToList());
                 session.Exercises = exercises;
             }
             return session;
