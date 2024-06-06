@@ -11,5 +11,9 @@ namespace Model
         public int Id { get; set; }
         public string Title { get; set; }
 
+        public override string ToString()
+        {
+            return $"Category Id: {Id}, Title: \"{Title}\"";
+        }
     }
 }

@@ -8,6 +8,7 @@ using Dommain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 
 namespace API.Services
 {
@@ -39,6 +40,9 @@ namespace API.Services
         /// <returns>The created comment.</returns>
         public async Task<Comment> CreateCommentAsync(Comment comment)
         {
+            Debug.WriteLine(comment.ToString());
+            Console.WriteLine(comment.ToString());
+            _logger.LogTrace("[LOG | CommentService] - (UpdateComment): " + comment.ToString());
             try
             {
                 var existingPost = await _dbContext.Posts.FirstOrDefaultAsync(p => p.Id == comment.Post.Id);

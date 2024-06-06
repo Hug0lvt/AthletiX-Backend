@@ -19,5 +19,14 @@ namespace Model
         public string Content { get; set; }
         public List<Comment> Comments { get; set; } = new List<Comment>();
 
+        public override string ToString()
+        {
+            string publisherName = Publisher != null ? Publisher.ToString() : "Anonymous";
+            string categoryName = Category != null ? Category.ToString() : "Uncategorized";
+            string publicationTypeName = PublicationType != null ? PublicationType.ToString() : "Unknown";
+            string commentsCount = Comments != null ? Comments.Count.ToString() : "0";
+        
+            return $"Post Id: {Id}, Publisher: {publisherName}, Category: {categoryName}, Title: \"{Title}\", Description: \"{Description}\", Publication Type: {publicationTypeName}, Content: \"{Content}\", Comments Count: {commentsCount}";
+        }
     }
 }

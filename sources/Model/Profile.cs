@@ -21,5 +21,12 @@ namespace Model
         public bool Gender { get; set; }
         public string Picture { get; set; } = string.Empty; // en base64 en base de données
 
+        public override string ToString()
+        {
+            string roleName = Role != null ? Role.ToString() : "No Role";
+            string genderString = Gender ? "Male" : "Female";
+        
+            return $"Profile Id: {Id}, Username: {Username}, Notification Token: {UniqueNotificationToken}, Role: {roleName}, Age: {Age}, Email: {Email}, Weight: {Weight} kg, Height: {Height} m, Gender: {genderString}, Picture Length: {Picture.Length} characters";
+        }
     }
 }
