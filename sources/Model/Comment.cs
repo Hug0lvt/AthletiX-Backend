@@ -12,18 +12,17 @@ namespace Model
         public int? ParentCommentId { get; set; }
         public DateTime PublishDate { get; set; }
         public Profile Publisher { get; set; }
-        public Post Post { get; set; }
+        public int PostId { get; set; }
         public string Content { get; set; }
         public List<Comment> Answers { get; set; } = new List<Comment>();
         
         public override string ToString()
         {
             string publisherName = Publisher != null ? Publisher.ToString() : "Anonymous";
-            string postTitle = Post != null ? Post.ToString() : "No Post";
             string parentCommentInfo = ParentCommentId.HasValue ? ParentCommentId.Value.ToString() : "No Parent";
             string answersCount = Answers != null ? Answers.Count.ToString() : "0";
             
-            return $"Comment Id: {Id}, Parent Comment Id: {parentCommentInfo}, Publish Date: {PublishDate}, Publisher: {publisherName}, Post: {postTitle}, Content: \"{Content}\", Answers Count: {answersCount}";
+            return $"Comment Id: {Id}, Parent Comment Id: {parentCommentInfo}, Publish Date: {PublishDate}, Publisher: {publisherName}, Post: {PostId}, Content: \"{Content}\", Answers Count: {answersCount}";
         }
     }
     
