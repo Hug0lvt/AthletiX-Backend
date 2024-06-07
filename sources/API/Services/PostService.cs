@@ -113,7 +113,9 @@ namespace API.Services
                 post.Comments = comments;
                 
                 List<Exercise> exercises = _mapper.Map<List<Exercise>>(_dbContext.ExerciseInPost
-                    .Where(p => p.PostId == post.Id).ToList());
+                    .Include(e => e.Exercise)
+                    .Where(p => p.PostId == post.Id)
+                    .Select(e => e.Exercise).ToList());
                 post.Exercises = exercises;
             }
             return post;
