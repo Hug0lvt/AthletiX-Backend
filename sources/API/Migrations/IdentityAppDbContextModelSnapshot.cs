@@ -428,6 +428,9 @@ namespace API.Migrations
                     b.Property<int>("ProfileId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProfileId");

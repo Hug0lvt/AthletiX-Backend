@@ -172,6 +172,7 @@ namespace API.Services
                 existingSession.Name = updatedSession.Name;
                 existingSession.Date = updatedSession.Date;
                 existingSession.Duration = updatedSession.Duration;
+                existingSession.Status = updatedSession.Status;
                 _dbContext.SaveChanges();
                 return _mapper.Map<Session>(existingSession);
             }
@@ -198,6 +199,35 @@ namespace API.Services
 
             _logger.LogTrace("[LOG | SessionService] - (DeleteSession): Session not found");
             throw new NotFoundException("[LOG | SessionService] - (DeleteSession): Session not found");
+        }
+        
+        /// <summary>
+        /// Updates status of an existing session.
+        /// </summary>
+        public Session UpdateStatusSession(int sessionId, int value)
+        {
+            var existingSession = _dbContext.Sessions
+                .FirstOrDefault(s => s.Id == sessionId);
+            if (existingSession != null)
+            {
+                int activeSessions = _dbContext.Sessions
+                    .Where(s => s.ProfileId == existingSession.ProfileId)
+                    .Select(s => s.Status == 1).Count();
+
+                if (activeSessions != 1 && value != 1)
+                {
+                    existingSession.Status = value;
+                    _dbContext.SaveChanges();
+                    return _mapper.Map<Session>(existingSession);
+                }
+                else
+                {
+                    throw new ConflictExecption($"{activeSessions} Session(s) is already active");
+                }
+            }
+
+            _logger.LogTrace("[LOG | SessionService] - (UpdateSession): Session not found");
+            throw new NotFoundException("[LOG | SessionService] - (UpdateSession): Session not found");
         }
     }
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(IdentityAppDbContext))]
-    [Migration("20240606205900_Ath-Auth")]
+    [Migration("20240607101518_Ath-Auth")]
     partial class AthAuth
     {
         /// <inheritdoc />
@@ -429,6 +429,9 @@ namespace API.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("ProfileId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
