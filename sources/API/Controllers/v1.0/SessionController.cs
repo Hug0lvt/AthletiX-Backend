@@ -142,5 +142,29 @@ namespace API.Controllers.v1_0
                 return NotFound(ex.Message);
             }
         }
+        
+        /// <summary>
+        /// Updates status of an existing session.
+        /// </summary>
+        [HttpPut("{sessionId}/updateStatus/{status}", Name = "PUT - Entrypoint for update Session")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public IActionResult UpdateStatusSession(int sessionId, int status)
+        {
+            try
+            {
+                var session = _sessionService.UpdateStatusSession(sessionId, status);
+                return Ok(session);
+            }
+            catch (ConflictExecption conflictExecption)
+            {
+                return Conflict(conflictExecption.Message);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

@@ -320,7 +320,8 @@ namespace API.Migrations
                     ProfileId = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Duration = table.Column<TimeSpan>(type: "interval", nullable: false)
+                    Duration = table.Column<TimeSpan>(type: "interval", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
