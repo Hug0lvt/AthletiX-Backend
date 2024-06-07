@@ -146,7 +146,7 @@ namespace API.Controllers.v1_0
         /// <summary>
         /// Updates status of an existing session.
         /// </summary>
-        [HttpPut("{sessionId}/updateStatus/{status}", Name = "PUT - Entrypoint for update Session")]
+        [HttpPut("{sessionId}/updateStatus/{status}", Name = "PUT - Entrypoint for update an status of Session")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
