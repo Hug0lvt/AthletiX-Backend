@@ -160,7 +160,7 @@ namespace API.Services
         public PracticalExercise GetPracticalExerciseById(int practicalExerciseId)
         {
             PracticalExercise exercise = _mapper.Map<PracticalExercise>(_dbContext.PracticalExercises
-                .Include(e => e.Exercise)
+                .Include(e => e.Exercise).ThenInclude(ex => ex.Category)
                 .Include(e => e.Session)
                 .FirstOrDefault(e => e.Id == practicalExerciseId));
             if (exercise != null)
