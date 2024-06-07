@@ -452,7 +452,7 @@ namespace API.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ExerciseId = table.Column<int>(type: "integer", nullable: false),
+                    PracticalExerciseId = table.Column<int>(type: "integer", nullable: false),
                     Reps = table.Column<int>(type: "integer", nullable: false),
                     WeightJson = table.Column<string>(type: "text", nullable: false),
                     Rest = table.Column<TimeSpan>(type: "interval", nullable: false),
@@ -463,8 +463,8 @@ namespace API.Migrations
                 {
                     table.PrimaryKey("PK_Sets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Sets_PracticalExercises_ExerciseId",
-                        column: x => x.ExerciseId,
+                        name: "FK_Sets_PracticalExercises_PracticalExerciseId",
+                        column: x => x.PracticalExerciseId,
                         principalTable: "PracticalExercises",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -608,9 +608,9 @@ namespace API.Migrations
                 column: "ProfileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sets_ExerciseId",
+                name: "IX_Sets_PracticalExerciseId",
                 table: "Sets",
-                column: "ExerciseId");
+                column: "PracticalExerciseId");
         }
 
         /// <inheritdoc />
