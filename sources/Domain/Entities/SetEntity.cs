@@ -16,9 +16,9 @@ namespace Dommain.Entities
         [Key]
         public int Id { get; set; }
 
-        public int ExerciseId { get; set; }
-        [ForeignKey(nameof(ExerciseId))]
-        public virtual PracticalExerciseEntity Exercise { get; set; }
+        public int PracticalExerciseId { get; set; }
+        [ForeignKey(nameof(PracticalExerciseId))]
+        public virtual PracticalExerciseEntity PracticalExercise { get; set; }
 
         public int Reps { get; set; }
         

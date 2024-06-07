@@ -105,7 +105,7 @@ namespace API.Services
                     if (exercise != null)
                     {
                         List<Set> sets = _mapper.Map<List<Set>>(_dbContext.Sets
-                        .Where(s => s.ExerciseId == exercise.Id).ToList());
+                        .Where(s => s.PracticalExerciseId == exercise.Id).ToList());
                         exercise.Sets = sets;
                     }
                 }
@@ -139,7 +139,7 @@ namespace API.Services
                     if (exercise != null)
                     {
                         List<Set> sets = _mapper.Map<List<Set>>(_dbContext.Sets
-                        .Where(s => s.ExerciseId == exercise.Id).ToList());
+                        .Where(s => s.PracticalExerciseId == exercise.Id).ToList());
                         exercise.Sets = sets;
                     }
                 }
@@ -166,7 +166,7 @@ namespace API.Services
             if (exercise != null)
             {
                 List<Set> sets = _mapper.Map<List<Set>>(_dbContext.Sets
-                .Where(s => s.ExerciseId == exercise.Id).ToList());
+                .Where(s => s.PracticalExerciseId == exercise.Id).ToList());
                 exercise.Sets = sets;
             }
             return exercise;

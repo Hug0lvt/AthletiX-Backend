@@ -446,13 +446,13 @@ namespace API.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsDone")
                         .HasColumnType("boolean");
 
                     b.Property<int>("Mode")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PracticalExerciseId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Reps")
@@ -467,7 +467,7 @@ namespace API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExerciseId");
+                    b.HasIndex("PracticalExerciseId");
 
                     b.ToTable("Sets");
                 });
@@ -767,13 +767,13 @@ namespace API.Migrations
 
             modelBuilder.Entity("Dommain.Entities.SetEntity", b =>
                 {
-                    b.HasOne("Domain.Entities.PracticalExerciseEntity", "Exercise")
+                    b.HasOne("Domain.Entities.PracticalExerciseEntity", "PracticalExercise")
                         .WithMany()
-                        .HasForeignKey("ExerciseId")
+                        .HasForeignKey("PracticalExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Exercise");
+                    b.Navigation("PracticalExercise");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
