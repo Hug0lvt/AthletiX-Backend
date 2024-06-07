@@ -14,7 +14,7 @@ namespace Model
         public List<float> Weight { get; set; } = new List<float>();
         public TimeSpan Rest { get; set; }
         public SetMode Mode { get; set; }
-        public PracticalExercise Exercise { get; set; }
+        public int PracticalExerciseId { get; set; }
         public bool IsDone { get; set; }
 
     }

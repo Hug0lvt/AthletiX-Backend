@@ -39,14 +39,14 @@ namespace API.Services
         {
             try
             {
-                var existingExercise = await _dbContext.PracticalExercises.FirstOrDefaultAsync(p => p.Id == set.Exercise.Id);
+                var existingExercise = await _dbContext.PracticalExercises.FirstOrDefaultAsync(p => p.Id == set.PracticalExerciseId);
                 if (existingExercise == null)
                     throw new NotCreatedExecption("Exercise does not exist.");
 
                 var entity = _mapper.Map<SetEntity>(set);
 
-                entity.ExerciseId = existingExercise.Id;
-                entity.Exercise = null;
+                entity.PracticalExerciseId = existingExercise.Id;
+                entity.PracticalExercise = null;
                 _dbContext.Entry(existingExercise).State = EntityState.Unchanged;
 
                 _dbContext.Sets.Add(entity);
@@ -79,7 +79,7 @@ namespace API.Services
         {
             var totalItems = _dbContext.Sets.Count();
             var items = _dbContext.Sets
-                .Include(s => s.Exercise)
+                .Include(s => s.PracticalExercise)
                 .Skip(pageNumber * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -100,7 +100,7 @@ namespace API.Services
         public Set GetSetById(int setId)
         {
             return _mapper.Map<Set>(_dbContext.Sets
-                .Include(s => s.Exercise)
+                .Include(s => s.PracticalExercise)
                 .FirstOrDefault(s => s.Id == setId));
         }
 
