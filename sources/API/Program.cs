@@ -2,12 +2,10 @@ using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using API.Services.Notification;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using API;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
+using API.Controllers.RealTime;
 using API.Mappers;
 using Microsoft.Extensions.FileProviders;
 
@@ -81,14 +79,6 @@ builder.Services.AddScoped<SetService>();
 builder.Services.AddScoped<PracticalExerciseService>();
 #endregion
 
-#region Firebase Tools
-FirebaseApp.Create(new AppOptions()//TODO ggkey.json à UPDATE (pas le bon)
-{
-    Credential = GoogleCredential.FromFile("ggkey.json"),
-});
-builder.Services.AddScoped<FCMService>(); //Notifications
-#endregion
-
 #region API And Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -143,6 +133,10 @@ builder.Services.AddApiVersioning(o =>
 });
 #endregion
 
+#region RealTime (SignalR)
+builder.Services.AddSignalR();
+#endregion
+
 var app = builder.Build();
 
 #region Use Swagger
@@ -170,6 +164,10 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseAuthorization();
 app.MapIdentityApi<AppUser>();
 app.MapControllers();
+
+#region RealTime (SignalR)
+app.MapHub<ChatHub>("/chathub");
+#endregion
 
 app.Run();
 

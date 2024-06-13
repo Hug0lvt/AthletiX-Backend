@@ -3,7 +3,6 @@ using API.Services;
 using Model;
 using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
-using API.Services.Notification;
 
 namespace API.Controllers.v1_0
 {
