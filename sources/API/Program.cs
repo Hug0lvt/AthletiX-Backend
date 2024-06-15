@@ -5,9 +5,9 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using API;
-using API.Controllers.RealTime;
 using API.Mappers;
 using Microsoft.Extensions.FileProviders;
+using API.RealTime;
 
 var builder = WebApplication.CreateBuilder(args);
 
