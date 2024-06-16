@@ -5,6 +5,7 @@ namespace API.RealTime
     using System.Linq;
     using Dommain.Entities;
     using Shared.Exceptions;
+    using Microsoft.EntityFrameworkCore;
 
     public class ChatHub : Hub
     {
