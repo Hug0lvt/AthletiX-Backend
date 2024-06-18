@@ -345,6 +345,10 @@ namespace API.Migrations
                     b.Property<int>("PublicationType")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");

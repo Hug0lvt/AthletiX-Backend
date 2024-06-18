@@ -22,6 +22,8 @@ Le projet AthletiX Backend est la logique métier pour le front de AthletiX.
 
 Le backend AthletiX peut être facilement déployé à l'aide de Docker. Assurez-vous d'avoir Docker installé sur votre machine.
 
+(En local il est nécéssaire d'avoir installer FFmpeg).
+
 Pour faire les migrations :
 ``` bash
 dotnet ef migrations add Ath-Auth --project .\1.API\

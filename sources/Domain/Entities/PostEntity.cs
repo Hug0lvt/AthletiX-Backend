@@ -27,6 +27,7 @@ namespace Dommain.Entities
         public string Description { get; set; } = string.Empty;
         public PublicationType PublicationType { get; set; }
         public string Content { get; set; } = string.Empty;
+        public string Thumbnail { get; set; } = string.Empty;
 
     }
 }
