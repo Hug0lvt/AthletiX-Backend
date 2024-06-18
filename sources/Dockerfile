@@ -6,7 +6,7 @@ USER root
 WORKDIR /app
 # Install ffmpeg
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ffmpeg=7:6.1.1-4 \
+    && apt-get install -y --no-install-recommends ffmpeg=7:5.1.5-0+deb12u1 \
     && rm -rf /var/lib/apt/lists/*
 # Create the necessary directories and set permissions for the app user
 RUN mkdir -p /app/athv1/posts && chown -R app:app /app
