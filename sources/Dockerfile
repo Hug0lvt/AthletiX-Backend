@@ -5,7 +5,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER root
 WORKDIR /app
 # Install ffmpeg
-RUN apt-get update && apt-get install -y ffmpeg
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 # Create the necessary directories and set permissions for the app user
 RUN mkdir -p /app/athv1/posts && chown -R app:app /app
 RUN mkdir -p /app/athv1/thumbnails && chown -R app:app /app
