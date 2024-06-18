@@ -151,7 +151,7 @@ namespace API.Services
             if (session != null)
             {
                 List<PracticalExercise> exercises = _mapper.Map<List<PracticalExercise>>(_dbContext.PracticalExercises
-                    .Include(p=> p.Exercise)
+                    .Include(p=> p.Exercise).ThenInclude(e => e.Category)
                     .Where(e => e.SessionId == session.Id).ToList());
                 session.Exercises = exercises;
             }
