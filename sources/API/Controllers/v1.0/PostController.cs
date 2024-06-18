@@ -3,6 +3,7 @@ using API.Services;
 using Model;
 using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using API.Services.Processing;
 
 namespace API.Controllers.v1_0
 {
@@ -18,6 +19,7 @@ namespace API.Controllers.v1_0
     {
         private readonly PostService _postService;
         private readonly string _storagePath = Path.Combine(Directory.GetCurrentDirectory(), "athv1", "posts");
+        private readonly string _storagePathThumbnails = Path.Combine(Directory.GetCurrentDirectory(), "athv1", "thumbnails");
         string videoBaseUri = Environment.GetEnvironmentVariable("VIDEO_BASE_URI", EnvironmentVariableTarget.Process) ?? "";
 
         /// <summary>
@@ -226,7 +228,16 @@ namespace API.Controllers.v1_0
             var fileUrl = $"{videoBaseUri}/videos/{newFileName}"; // TODO A test sur codefirst
 
             existingPost.Content = fileUrl;
-            if (_postService.IsVideoExtension(extension)) existingPost.PublicationType = Shared.Enums.PublicationType.Video;
+            if (_postService.IsVideoExtension(extension))
+            {
+                var newFileNameThumbnail = $"Ath-thumbnail-{DateTime.Now.ToString("yyyyMMddHHmmss")}-{postId}.png";
+                var output = Path.Combine(_storagePathThumbnails, newFileNameThumbnail);
+                existingPost.Thumbnail = $"{videoBaseUri}/thumbnails/{newFileNameThumbnail}";
+                ExtractThumbnail.GetThumbnail(filePath, output, 0);
+                
+
+                existingPost.PublicationType = Shared.Enums.PublicationType.Video;
+            }
             if (_postService.IsImageExtension(extension)) existingPost.PublicationType = Shared.Enums.PublicationType.Image;
 
             return Ok(_postService.UpdatePost(postId, existingPost));

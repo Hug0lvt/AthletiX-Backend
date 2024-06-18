@@ -165,6 +165,14 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(physicalPath),
     RequestPath = new PathString("/videos") // TODO Protect le /videos ??
 });
+
+var physicalPathThumbnails = Path.Combine(Directory.GetCurrentDirectory(), "athv1", "thumbnails");
+if (!Directory.Exists(physicalPathThumbnails)) Directory.CreateDirectory(physicalPathThumbnails);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(physicalPathThumbnails),
+    RequestPath = new PathString("/thumbnails") // TODO Protect le /thumbnails ??
+});
 #endregion
 
 app.UseAuthorization();

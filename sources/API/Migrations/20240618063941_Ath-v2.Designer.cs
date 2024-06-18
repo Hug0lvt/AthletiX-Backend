@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace API.Migrations
 {
     [DbContext(typeof(IdentityAppDbContext))]
-    [Migration("20240607105328_Ath-Auth")]
-    partial class AthAuth
+    [Migration("20240618063941_Ath-v2")]
+    partial class Athv2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -347,6 +347,10 @@ namespace API.Migrations
 
                     b.Property<int>("PublicationType")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()

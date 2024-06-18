@@ -4,8 +4,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 # Switch to root to set permissions
 USER root
 WORKDIR /app
+# Install ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg
 # Create the necessary directories and set permissions for the app user
 RUN mkdir -p /app/athv1/posts && chown -R app:app /app
+RUN mkdir -p /app/athv1/thumbnails && chown -R app:app /app
 # Switch back to the app user
 USER app
 EXPOSE 8080

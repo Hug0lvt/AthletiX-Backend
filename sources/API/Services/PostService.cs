@@ -233,6 +233,7 @@ namespace API.Services
             {
                 existingPost.Title = updatedPost.Title;
                 existingPost.Content = updatedPost.Content;
+                existingPost.Thumbnail = updatedPost.Thumbnail;
                 existingPost.Description = updatedPost.Description;
                 existingPost.CategoryId = updatedPost.Category.Id;
                 existingPost.ProfileId = updatedPost.Publisher.Id;
