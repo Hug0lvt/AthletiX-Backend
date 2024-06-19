@@ -4,6 +4,7 @@ using Model;
 using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using API.Services.Processing;
+using Dommain.Entities;
 
 namespace API.Controllers.v1_0
 {
@@ -288,6 +289,17 @@ namespace API.Controllers.v1_0
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
+        }
+
+        [HttpGet("search/{value}", Name = "GET - Entrypoint for search list of post")]
+        public async Task<ActionResult<IEnumerable<PostEntity>>> Search(string value)
+        {
+            var posts = await _postService.SearchPostsAsync(value);
+            /*if (posts == null || posts.TotalItems == 0)
+            {
+                return NotFound();
+            }*/
+            return Ok(posts);
         }
     }
 }

@@ -3,6 +3,7 @@ using API.Services;
 using Model;
 using Shared.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using Dommain.Entities;
 
 namespace API.Controllers.v1_0
 {
@@ -122,6 +123,13 @@ namespace API.Controllers.v1_0
             {
                 return NotFound(ex.Message);
             }
+        }
+
+        [HttpGet("search/{value}", Name = "GET - Entrypoint for search Profile")]
+        public async Task<ActionResult<IEnumerable<ProfileEntity>>> Search(string value)
+        {
+            var profiles = await _profileService.SearchProfilesAsync(value);
+            return Ok(profiles);
         }
     }
 }
