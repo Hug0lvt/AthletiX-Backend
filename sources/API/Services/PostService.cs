@@ -476,5 +476,27 @@ namespace API.Services
             _dbContext.SaveChanges();
             return true;
         }
+
+        public async Task<PaginationResult<Post>> SearchPostsAsync(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return new PaginationResult<Post>
+                {
+                    Items = new List<Post>(),
+                    TotalItems = 0
+                };
+            }
+
+            var returnedPosts = await _dbContext.Posts
+                .Where(p => p.Title.Contains(value) || p.Description.Contains(value) || p.Content.Contains(value))
+                .ToListAsync();
+
+            return new PaginationResult<Post>
+            {
+                Items = _mapper.Map<List<Post>>(returnedPosts),
+                TotalItems = returnedPosts.Count()
+            };
+        }
     }
 }

@@ -3,6 +3,7 @@ using Dommain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Model;
+using Shared;
 using Shared.Exceptions;
 
 namespace API.Services
@@ -142,6 +143,28 @@ namespace API.Services
 
             _logger.LogTrace("[LOG | ProfileService] - (DeleteProfile): Profile not found");
             throw new NotFoundException("[LOG | ProfileService] - (DeleteProfile): Profile not found");
+        }
+
+        public async Task<PaginationResult<Profile>> SearchProfilesAsync(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return new PaginationResult<Profile>
+                {
+                    Items = new List<Profile>(),
+                    TotalItems = 0
+                };
+            }
+
+            var returnedProfiles = await _dbContext.Profiles
+                .Where(p => p.Username.Contains(value) || p.Email.Contains(value))
+                .ToListAsync();
+
+            return new PaginationResult<Profile>
+            {
+                Items = _mapper.Map<List<Profile>>(returnedProfiles),
+                TotalItems = returnedProfiles.Count()
+            };
         }
     }
 }
